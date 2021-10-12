@@ -30,9 +30,9 @@ def keyword_lookup(x,bio_functions:pd.DataFrame,bio_function_rules:pd.DataFrame)
 '''
     Main Code 
 '''
-if __name__ == "__main__":
-    bio_functions = pd.read_csv("./biomimicry_functions_enumerated.csv")
-    function_rule_phrases = pd.read_csv("./biomimicry_function_rules.csv")
+def create_labeling_functions(bio_file:str, bio_rules:str):
+    bio_functions = pd.read_csv(bio_file)
+    function_rule_phrases = pd.read_csv(bio_rules)
     
     labeling_function_list = list()
 
@@ -42,8 +42,5 @@ if __name__ == "__main__":
         labeling_function = LabelingFunction(name=f"keyword_{label_name}", f=keyword_lookup,
                 resources={"bio_functions":bio_functions,"bio_function_rules":function_rule_phrases})
         labeling_function_list.append(labeling_function)
-
-    applier = PandasLFApplier(lfs=labeling_function_list)
-    # L_train = applier.apply(df=df_train)
-    # L_test = applier.apply(df=df_test)
-    print("done")
+    
+    return labeling_function_list
