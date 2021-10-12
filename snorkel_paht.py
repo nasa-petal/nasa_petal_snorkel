@@ -62,5 +62,9 @@ def create_labeling_functions(bio_file:pd.DataFrame, bio_rules:pd.DataFrame):
 
     return labeling_function_list
 
+def get_labeling_function_list():
+    labeling_function_list = create_labeling_functions('biomimicry_functions_enumerated.csv', 'biomimicry_function_rules.csv')
+    print(labeling_function_list)
+
 
         
