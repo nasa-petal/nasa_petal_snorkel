@@ -18,10 +18,10 @@ def load_dataset(load_train_labels: bool = False, split_dev_valid: bool = False)
     df_dev = df_train.sample(frac=0.2, random_state=123)
 
     if not load_train_labels:
-        df_train['snorkel_label'] = np.ones(len(df_train['snorkel_label'])) * -1
+        df_train['label'] = np.ones(len(df_train['label'])) * -1
     
     df_valid_test = df_train.sample(frac=0.5, random_state=123)
-    df_valid, df_test = train_test_split(df_valid_test, random_state=123, stratify=df_valid_test.snorkel_label)
+    df_valid, df_test = train_test_split(df_valid_test, random_state=123, stratify=df_valid_test.label)
 
     if split_dev_valid:
         return df_train, df_dev, df_valid, df_test
