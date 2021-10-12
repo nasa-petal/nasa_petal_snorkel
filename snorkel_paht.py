@@ -31,6 +31,7 @@ def keyword_lookup(x,bio_functions:pd.DataFrame,bio_function_rules:pd.DataFrame)
     Main Code 
 '''
 phrases_to_look_for = []
+labeling_function_list = []
 
 def create_labeling_functions(bio_file:pd.DataFrame, bio_rules:pd.DataFrame):
     """create a list of labeling functions
@@ -45,7 +46,6 @@ def create_labeling_functions(bio_file:pd.DataFrame, bio_rules:pd.DataFrame):
     bio_file = pd.read_csv(bio_file)
     bio_rules = pd.read_csv(bio_rules)
     
-    labeling_function_list = list()
     for i in range(len(bio_file)):
         label_name = bio_file.iloc[i]['function'] 
         label_rule_name = label_name + "_rules"
@@ -62,9 +62,6 @@ def create_labeling_functions(bio_file:pd.DataFrame, bio_rules:pd.DataFrame):
 
     return labeling_function_list
 
-def get_labeling_function_list():
-    labeling_function_list = create_labeling_functions('biomimicry_functions_enumerated.csv', 'biomimicry_function_rules.csv')
-    print(labeling_function_list)
 
 
         
