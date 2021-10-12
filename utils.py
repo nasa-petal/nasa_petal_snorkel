@@ -6,10 +6,14 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 
 def load_dataset(load_train_labels: bool = False, split_dev_valid: bool = False):
-    filename = r"C:\Users\ARalevski\Documents\petal_snorkel\snorkel_spam_test.csv"
+    filename = r"C:\Users\ARalevski\Documents\petal_snorkel\David work\labeled_data.csv"
     df = pd.read_csv(filename)
-    # df['text'] = df['title'] + df['abstract']
-
+    #lowercase column names
+    df.columns = map(str.lower, df.columns)
+    #comnine title and abstract columns into one and drop columns
+    df['text'] = df['title'] + ' ' + df['abstract']
+    df = df.drop(['title', 'abstract'], axis=1)
+    
     df_train = df.sample(frac=0.6, random_state=123).reset_index(drop=True)
     df_dev = df_train.sample(frac=0.2, random_state=123)
 
