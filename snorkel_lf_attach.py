@@ -11,12 +11,12 @@ ABSTAIN = -1
 attach_permanently = 0
 attach_temporarily = 1
 
-enum_bio = pd.read_csv(r"C:\Users\ARalevski\Documents\Petal\Snorkel-PeTaL\biomimicry_functions_enumerated.csv")
+enum_bio = pd.read_csv("./biomimicry_functions_enumerated.csv")
 # enum_bio["function"] = enum_bio["function"].apply(clean_text)
 enum_bio = enum_bio.set_index("function")
 
 # Load phrase heuristics
-function_rule_phrases = pd.read_csv(r"C:\Users\ARalevski\Documents\Petal\Snorkel-PeTaL\biomimicry_function_rules.csv")
+function_rule_phrases = pd.read_csv("./biomimicry_function_rules.csv")
 functions = ['attach_temporarily', 'attach_permanently'] #do we want to just pull the rows where 'Attach' is in level1?
 lfs_attach = []
 
@@ -31,6 +31,8 @@ def create_keyword_list(functions):
         rule = rule.replace(" ", "_")
         keyword_lst.append(rule)
     return keyword_lst
+
+create_keyword_list(function_rule_phrases)
 
 #create keyword lfs for every rule in each attach function
 class CreateKeywordLfs:
