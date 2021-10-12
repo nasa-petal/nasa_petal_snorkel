@@ -1,6 +1,6 @@
 import pandas as pd
 
-df = pd.read_csv(r"C:\Users\ARalevski\Documents\Petal\Snorkel-PeTaL\biomimicry_functions_enumerated.csv")
+df = pd.read_csv("./biomimicry_functions_enumerated.csv")
 
 def enumerate_functions(*argv):
   for arg in argv:
