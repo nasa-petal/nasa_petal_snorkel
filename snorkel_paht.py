@@ -60,7 +60,7 @@ def create_labeling_functions(bio_file:pd.DataFrame, bio_rules:pd.DataFrame):
                 new_list.append(rule)
         for item in new_list:
             item = item.replace(" ", "_")
-            underscore_list.append(rule)
+            underscore_list.append(item)
         for phrase in underscore_list:
             labeling_function = LabelingFunction(name=f"keyword_{phrase}", f=keyword_lookup,
                             resources={"bio_functions":bio_file,"bio_function_rules":bio_rules})
@@ -69,6 +69,6 @@ def create_labeling_functions(bio_file:pd.DataFrame, bio_rules:pd.DataFrame):
     return labeling_function_list
 
 
-# create_labeling_functions(r'C:\Users\ARalevski\Documents\petal_snorkel\biomimicry_functions_enumerated.csv', r'C:\Users\ARalevski\Documents\petal_snorkel\biomimicry_function_rules.csv')
+create_labeling_functions(r'C:\Users\ARalevski\Documents\petal_snorkel\biomimicry_functions_enumerated.csv', r'C:\Users\ARalevski\Documents\petal_snorkel\biomimicry_function_rules.csv')
 
         
