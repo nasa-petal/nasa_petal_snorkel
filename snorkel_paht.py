@@ -46,7 +46,6 @@ def create_labeling_functions(bio_file:pd.DataFrame, bio_rules:pd.DataFrame):
     bio_rules = pd.read_csv(bio_rules)
 
     underscore_list = []
-    phrases_to_look_for = []
     labeling_function_list = []
     
     for i in range(len(bio_file)):
