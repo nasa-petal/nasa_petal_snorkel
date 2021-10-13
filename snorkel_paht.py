@@ -2,6 +2,8 @@ import pandas as pd
 from snorkel.labeling import LabelingFunction
 import itertools
 
+from snorkel.labeling.lf.core import labeling_function
+
 '''
     Useful Functions 
 '''
@@ -75,7 +77,12 @@ def create_labeling_functions(bio_file:pd.DataFrame, bio_rules:pd.DataFrame):
                         resources={"bio_functions":bio_file,"bio_function_rules":bio_rules})
         labeling_function_list.append(labeling_function)
 
+    print(len(labeling_function_list))
     return labeling_function_list
+    
+
+
+# create_labeling_functions(r'C:\Users\ARalevski\Documents\petal_snorkel\biomimicry_functions_enumerated.csv', r'C:\Users\ARalevski\Documents\petal_snorkel\biomimicry_function_rules.csv')
 
 
 
