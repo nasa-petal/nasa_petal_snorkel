@@ -7,12 +7,12 @@ Original file is located at
     https://colab.research.google.com/drive/1tZDTZ_1lPCEvH4zv0c4ewzSAod9nCOFg
 """
 
-from snorkel.labeling import LabelingFunction
-from snorkel.labeling import labeling_function
+# from snorkel.labeling import LabelingFunction
+# from snorkel.labeling import labeling_function
 from snorkel.labeling.model import LabelModel
 from snorkel.labeling import PandasLFApplier
 from snorkel.labeling import LFAnalysis
-from snorkel.analysis import get_label_buckets
+# from snorkel.analysis import get_label_buckets
 from snorkel.labeling.model import MajorityLabelVoter
 from snorkel.labeling import filter_unlabeled_dataframe
 import pickle, os
@@ -45,6 +45,7 @@ if os.path.exists('lf_analysis.pickle'):
         lf_analysis = data['lf_analysis']
         L_train = data['L_train']
         L_test = data['L_test']
+
 # buckets = get_label_buckets(L_train[:, 0], L_train[:, 1])
 # df_train.iloc[buckets[(ABSTAIN, SPAM)]].sample(10, random_state=1)
 
@@ -54,31 +55,31 @@ preds_train = majority_model.predict(L=L_train)
 label_model = LabelModel(cardinality=3, verbose=True, device='gpu')
 label_model.fit(L_train=L_train, n_epochs=500, log_freq=100, seed=123)
 
-L_train
+# L_train
 
-L_test
+# L_test
 
-Y_test
+# Y_test
 
-majority_acc = majority_model.score(L=L_test, Y=Y_test, tie_break_policy="random")[
-    "accuracy"
-]
+# majority_acc = majority_model.score(L=L_test, Y=Y_test, tie_break_policy="random")[
+#     "accuracy"
+# ]
 
-print(f"{'Majority Vote Accuracy:':<25} {majority_acc * 100:.1f}%")
+# print(f"{'Majority Vote Accuracy:':<25} {majority_acc * 100:.1f}%")
 
-label_model_acc = label_model.score(L=L_test, Y=Y_test, tie_break_policy="random")[
-     "accuracy"
- ]
+# label_model_acc = label_model.score(L=L_test, Y=Y_test, tie_break_policy="random")[
+#      "accuracy"
+#  ]
 
-print(f"{'Label Model Accuracy:':<25} {label_model_acc * 100:.1f}%")
+# print(f"{'Label Model Accuracy:':<25} {label_model_acc * 100:.1f}%")
 
-LFAnalysis(L=L_train, lfs=lfs).lf_summary()
+LFAnalysis(L=L_train, lfs=labeling_function_list).lf_summary()
 
 df_train_filtered, preds_train_filtered = filter_unlabeled_dataframe(
     X=df_train, y=preds_train, L=L_train)
 
 df_train["label"] = label_model.predict(L=L_train, tie_break_policy="abstain")
 
-label_model.save("snorkel_2.pkl")
+label_model.save("snorkel_model.pkl")
 
-df_train.to_csv("results_keyword_test.csv")
+df_train.to_csv("results.csv")
