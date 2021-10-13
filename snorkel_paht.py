@@ -46,7 +46,7 @@ def create_labeling_functions(bio_file:pd.DataFrame, bio_rules:pd.DataFrame):
     bio_rules = pd.read_csv(bio_rules)
 
     underscore_list = []
-    phrases_list = []
+    new_list = []
     labeling_function_list = []
     
     for i in range(len(bio_file)):
@@ -56,12 +56,12 @@ def create_labeling_functions(bio_file:pd.DataFrame, bio_rules:pd.DataFrame):
             phrases_lst = bio_rules[label_rule_name].to_list()
             remove_na = [x for x in phrases_lst if pd.isnull(x) == False]
         for rule in remove_na:
-            rule = rule.replace(" ", "_")
+            if rule not in new_list:
+                new_list.append(rule)
+        for item in new_list:
+            item = item.replace(" ", "_")
             underscore_list.append(rule)
-        for item in underscore_list:
-            if item not in phrases_list:
-                phrases_list.append(item)
-        for phrase in phrases_list:
+        for phrase in underscore_list:
             labeling_function = LabelingFunction(name=f"keyword_{phrase}", f=keyword_lookup,
                             resources={"bio_functions":bio_file,"bio_function_rules":bio_rules})
             labeling_function_list.append(labeling_function)
@@ -69,6 +69,6 @@ def create_labeling_functions(bio_file:pd.DataFrame, bio_rules:pd.DataFrame):
     return labeling_function_list
 
 
-
+# create_labeling_functions(r'C:\Users\ARalevski\Documents\petal_snorkel\biomimicry_functions_enumerated.csv', r'C:\Users\ARalevski\Documents\petal_snorkel\biomimicry_function_rules.csv')
 
         
