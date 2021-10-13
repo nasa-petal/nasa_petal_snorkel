@@ -1,5 +1,6 @@
 import pandas as pd 
 from snorkel.labeling import LabelingFunction
+import itertools
 
 '''
     Useful Functions 
@@ -45,30 +46,37 @@ def create_labeling_functions(bio_file:pd.DataFrame, bio_rules:pd.DataFrame):
     bio_file = pd.read_csv(bio_file)
     bio_rules = pd.read_csv(bio_rules)
 
+    lst = []
     underscore_list = []
-    new_list = []
+    rules_no_na = []
     labeling_function_list = []
     
+    #get a list of all the rules
     for i in range(len(bio_file)):
         label_name = bio_file.iloc[i]['function'] 
         label_rule_name = label_name + "_rules"
         if label_rule_name in list(bio_rules.columns):
             phrases_lst = bio_rules[label_rule_name].to_list()
-            remove_na = [x for x in phrases_lst if pd.isnull(x) == False]
-        for rule in remove_na:
-            if rule not in new_list:
-                new_list.append(rule)
-        for item in new_list:
-            item = item.replace(" ", "_")
-            underscore_list.append(item)
-        for phrase in underscore_list:
-            labeling_function = LabelingFunction(name=f"keyword_{phrase}", f=keyword_lookup,
-                            resources={"bio_functions":bio_file,"bio_function_rules":bio_rules})
-            labeling_function_list.append(labeling_function)
+            lst.append(phrases_lst)
+    chained_lst = (list(itertools.chain.from_iterable(lst)))
+    #remove blank cells
+    remove_na = [x for x in chained_lst if pd.isnull(x) == False]
+    #remove duplicates
+    for rule in remove_na:
+        if rule not in rules_no_na:
+            rules_no_na.append(rule)
+    #add underscore to rules
+    for item in rules_no_na:
+        item = item.replace(" ", "_")
+        underscore_list.append(item)
+    #create labeling function for each rule
+    for phrase in underscore_list:
+        labeling_function = LabelingFunction(name=f"keyword_{phrase}", f=keyword_lookup,
+                        resources={"bio_functions":bio_file,"bio_function_rules":bio_rules})
+        labeling_function_list.append(labeling_function)
 
     return labeling_function_list
 
 
-create_labeling_functions(r'C:\Users\ARalevski\Documents\petal_snorkel\biomimicry_functions_enumerated.csv', r'C:\Users\ARalevski\Documents\petal_snorkel\biomimicry_function_rules.csv')
 
         
