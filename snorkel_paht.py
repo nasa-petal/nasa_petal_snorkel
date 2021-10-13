@@ -44,10 +44,11 @@ def create_labeling_functions(bio_file:pd.DataFrame, bio_rules:pd.DataFrame):
     """
     bio_file = pd.read_csv(bio_file)
     bio_rules = pd.read_csv(bio_rules)
-    
+
+    underscore_list = []
     phrases_to_look_for = []
     labeling_function_list = []
-
+    
     for i in range(len(bio_file)):
         label_name = bio_file.iloc[i]['function'] 
         label_rule_name = label_name + "_rules"
@@ -56,7 +57,8 @@ def create_labeling_functions(bio_file:pd.DataFrame, bio_rules:pd.DataFrame):
             remove_na = [x for x in phrases_lst if pd.isnull(x) == False]
         for rule in remove_na:
             rule = rule.replace(" ", "_")
-            phrases_to_look_for.append(rule)
+            underscore_list.append(rule)
+        phrases_to_look_for = list(set(underscore_list))
         for phrase in phrases_to_look_for:
             labeling_function = LabelingFunction(name=f"keyword_{phrase}", f=keyword_lookup,
                             resources={"bio_functions":bio_file,"bio_function_rules":bio_rules})
