@@ -27,8 +27,7 @@ def keyword_lookup(x,bio_functions:pd.DataFrame,bio_function_rules:pd.DataFrame)
             for phrase in phrases_to_look_for:
                 # now you could make a counter and see the percentage match so if 10/20 phrases are in the text/abstract then you return the
                 if phrase in x.text.lower():     
-                    return label_id
-        
+                    return label_id 
     return -1
 
 '''
