@@ -82,7 +82,7 @@ def create_labeling_functions(bio_file:pd.DataFrame, bio_rules:pd.DataFrame):
     
 
 
-# create_labeling_functions(r'C:\Users\ARalevski\Documents\petal_snorkel\biomimicry_functions_enumerated.csv', r'C:\Users\ARalevski\Documents\petal_snorkel\biomimicry_function_rules.csv')
+# create_labeling_functions(r'snorkel_test\functions_enumerated_small.csv', r'snorkel_test\function_rules_small.csv')
 
 
 

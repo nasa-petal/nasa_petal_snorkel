@@ -52,7 +52,7 @@ if os.path.exists('lf_analysis.pickle'):
 majority_model = MajorityLabelVoter()
 preds_train = majority_model.predict(L=L_train)
 
-label_model = LabelModel(cardinality=3, verbose=True, device='gpu')
+label_model = LabelModel(cardinality=665, verbose=True, device = 'gpu')
 label_model.fit(L_train=L_train, n_epochs=500, log_freq=100, seed=123)
 
 # L_train
