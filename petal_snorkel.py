@@ -16,69 +16,68 @@ from snorkel.analysis import get_label_buckets
 from snorkel.labeling.model import MajorityLabelVoter
 from snorkel.labeling import filter_unlabeled_dataframe
 import pickle, os
-
-#import csv file and load train/test/split of dataset
 from utils import load_dataset
-df_train, df_test = load_dataset()
-# df_train = df_train.fillna("")
-Y_test = df_test.label.values
-
-#get lfs
 from snorkel_paht import *
-labeling_function_list = create_labeling_functions(r'./biomimicry_functions_enumerated.csv', r'./biomimicry_function_rules.csv')
 
-len(labeling_function_list)
+if __name__=="__main__":
+    df_train, df_test = load_dataset() #import csv file and load train/test/split of dataset
+    # df_train = df_train.fillna("")
+    Y_test = df_test.label.values
 
-if not os.path.exists('lf_analysis.pickle'):
-    applier = PandasLFApplier(lfs=labeling_function_list)
-    # define train and test sets
-    L_train = applier.apply(df=df_train)
-    L_test = applier.apply(df=df_test)
+    labeling_function_list = create_labeling_functions(r'./biomimicry_functions_enumerated.csv', r'./biomimicry_function_rules.csv')
 
-    df = LFAnalysis(L=L_train, lfs=labeling_function_list).lf_summary()
-    with open('lf_analysis.pickle','wb') as f:
-        pickle.dump({"lf_analysis":df, 'L_train':L_train,'L_test':L_test},f)
+    len(labeling_function_list)
 
-if os.path.exists('lf_analysis.pickle'):
-    with open('lf_analysis.pickle','rb') as f:
-        data = pickle.load(f)
-        lf_analysis = data['lf_analysis']
-        L_train = data['L_train']
-        L_test = data['L_test']
-# buckets = get_label_buckets(L_train[:, 0], L_train[:, 1])
-# df_train.iloc[buckets[(ABSTAIN, SPAM)]].sample(10, random_state=1)
+    if not os.path.exists('lf_analysis.pickle'):
+        applier = PandasLFApplier(lfs=labeling_function_list)
+        # define train and test sets
+        L_train = applier.apply(df=df_train)
+        L_test = applier.apply(df=df_test)
 
-majority_model = MajorityLabelVoter()
-preds_train = majority_model.predict(L=L_train)
+        df = LFAnalysis(L=L_train, lfs=labeling_function_list).lf_summary()
+        with open('lf_analysis.pickle','wb') as f:
+            pickle.dump({"lf_analysis":df, 'L_train':L_train,'L_test':L_test},f)
 
-label_model = LabelModel(cardinality=3, verbose=True, device='gpu')
-label_model.fit(L_train=L_train, n_epochs=500, log_freq=100, seed=123)
+    if os.path.exists('lf_analysis.pickle'):
+        with open('lf_analysis.pickle','rb') as f:
+            data = pickle.load(f)
+            lf_analysis = data['lf_analysis']
+            L_train = data['L_train']
+            L_test = data['L_test']
+    # buckets = get_label_buckets(L_train[:, 0], L_train[:, 1])
+    # df_train.iloc[buckets[(ABSTAIN, SPAM)]].sample(10, random_state=1)
 
-L_train
+    majority_model = MajorityLabelVoter()
+    preds_train = majority_model.predict(L=L_train)
 
-L_test
+    label_model = LabelModel(cardinality=3, verbose=True, device='cpu')
+    label_model.fit(L_train=L_train, n_epochs=500, log_freq=100, seed=123)
 
-Y_test
+    L_train
 
-majority_acc = majority_model.score(L=L_test, Y=Y_test, tie_break_policy="random")[
-    "accuracy"
-]
+    L_test
 
-print(f"{'Majority Vote Accuracy:':<25} {majority_acc * 100:.1f}%")
+    Y_test
 
-label_model_acc = label_model.score(L=L_test, Y=Y_test, tie_break_policy="random")[
-     "accuracy"
- ]
+    majority_acc = majority_model.score(L=L_test, Y=Y_test, tie_break_policy="random")[
+        "accuracy"
+    ]
 
-print(f"{'Label Model Accuracy:':<25} {label_model_acc * 100:.1f}%")
+    print(f"{'Majority Vote Accuracy:':<25} {majority_acc * 100:.1f}%")
 
-LFAnalysis(L=L_train, lfs=lfs).lf_summary()
+    label_model_acc = label_model.score(L=L_test, Y=Y_test, tie_break_policy="random")[
+        "accuracy"
+    ]
 
-df_train_filtered, preds_train_filtered = filter_unlabeled_dataframe(
-    X=df_train, y=preds_train, L=L_train)
+    print(f"{'Label Model Accuracy:':<25} {label_model_acc * 100:.1f}%")
 
-df_train["label"] = label_model.predict(L=L_train, tie_break_policy="abstain")
+    LFAnalysis(L=L_train, lfs=lfs).lf_summary()
 
-label_model.save("snorkel_2.pkl")
+    df_train_filtered, preds_train_filtered = filter_unlabeled_dataframe(
+        X=df_train, y=preds_train, L=L_train)
 
-df_train.to_csv("results_keyword_test.csv")
+    df_train["label"] = label_model.predict(L=L_train, tie_break_policy="abstain")
+
+    label_model.save("snorkel_2.pkl")
+
+    df_train.to_csv("results_keyword_test.csv")
