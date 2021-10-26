@@ -1,7 +1,7 @@
 # PeTaL Snorkel 
 ## Overview
 
-This repository contains scripts, notebooks, data, and docs used for utilizing the snorkel machine learning model. This model uses weak supervision to label large amounts of training data using programmatic labeling functions based on rules.
+This repository contains scripts, notebooks, data, and docs used for utilizing the snorkel machine learning model. This model uses weak supervision to label large amounts of training data using programmatic labeling functions (lfs) based on keyword 'rules'.
 
 This README was last updated on 29 October 2021.
 
