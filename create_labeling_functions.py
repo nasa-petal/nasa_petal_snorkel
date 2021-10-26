@@ -76,13 +76,10 @@ def create_labeling_functions(bio_file:pd.DataFrame, bio_rules:pd.DataFrame):
         labeling_function = LabelingFunction(name=f"keyword_{phrase}", f=keyword_lookup,
                         resources={"bio_functions":bio_file,"bio_function_rules":bio_rules})
         labeling_function_list.append(labeling_function)
-
-    # print(len(labeling_function_list))
+    
     return labeling_function_list
     
 
-
-# create_labeling_functions(r'snorkel_test\functions_enumerated_small.csv', r'snorkel_test\function_rules_small.csv')
 
 
 
