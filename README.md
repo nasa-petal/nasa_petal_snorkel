@@ -1,5 +1,11 @@
 ![nasa-logo-web-rgb](https://user-images.githubusercontent.com/68359251/138969060-f239955e-e5a3-4633-88d7-592fcaaa3877.png)
 
+# Links
+ * Bullet list
+ * [Overview](#overview)
+ * Future Wo
+  
+
 # PeTaL Snorkel 
 ## Overview
 
@@ -52,6 +58,11 @@ Takes in data from ```labeled_data.csv``` and applies a -1 'abstain' label to ea
 Create keyword labeling functions (lfs) for every rule in ```biomimicry_function_rules.csv```
 
 ## petal_snorkel.py
+
+# Future Work
+
+# Contact
+For questions contact Alexandra Ralevski (alexandra.ralevski@gmail.com)
 
 
 
