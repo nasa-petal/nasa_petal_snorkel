@@ -23,7 +23,7 @@ This README was last updated on 29 October 2021.
 
 ```utils.py``` data cleaning and train/test/split of data
 
-```snorkel_spam_test``` folder containing all the files needed to run a short test of snorkel using a spam YouTube dataset. More details here: https://www.snorkel.org/use-cases/01-spam-tutorial
+```snorkel_spam_test``` folder containing all the files needed to run a short test of snorkel using a spam YouTube dataset.
 
 # Getting Started
 ## Environment and setup
@@ -34,7 +34,7 @@ Snorkel requires Python 3.6 or later. The entire conda environment for running s
 Note that each script has detailed instructions in its opening comment.
 
 ## snorkel_spam_test
-To get a sense of how snorkel works and run a quick data labeling tutorial, utilize these files. More info can be found here: https://www.snorkel.org/use-cases/01-spam-tutorial
+Get a sense of how snorkel works and run a quick data labeling tutorial using a YouTube spam comments dataset. More info can be found here: https://www.snorkel.org/use-cases/01-spam-tutorial
 
 ## labeled_data.csv
 Dataset of labeled biomimicry data
