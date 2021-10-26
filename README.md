@@ -1,3 +1,5 @@
+![alt text](https://www.google.com/url?sa=i&url=https%3A%2F%2Fpngio.com%2Fimages%2Fpng-a894871.html&psig=AOvVaw1UAw0NapSYbfxPiCsKiVeX&ust=1635372892740000&source=images&cd=vfe&ved=0CAsQjRxqFwoTCODdnvWM6fMCFQAAAAAdAAAAABAI)
+
 # PeTaL Snorkel 
 ## Overview
 
@@ -20,5 +22,7 @@ This README was last updated on 29 October 2021.
 ```utils.py``` data cleaning and train/test/split of data
 
 ```snorkel_spam_test``` folder containing all the files needed to run a short test of snorkel using a spam YouTube dataset. More details here: https://www.snorkel.org/use-cases/01-spam-tutorial
+
+# Getting Started
 
 
