@@ -15,7 +15,7 @@ This README was last updated on 29 October 2021.
 
 ```petal_snorkel.ipynb``` Jupyter notebook for running snorkel
 
-```biomimicry_function_rules.csv``` contains rules for 40 of the 100 biomimicry functions. For example, the function 'attach permanently', contains the keyword rules 'attach firmly', 'biological adhesive', and 'biological glue'.
+```biomimicry_function_rules.csv``` contains rules for 40 of the 100 biomimicry functions.
 
 ```biomimicry_functions_enumerated.csv``` contains all 100 of the biomimicry functions labeled 0-99.
 
@@ -31,6 +31,29 @@ This README was last updated on 29 October 2021.
 Snorkel requires Python 3.6 or later. The entire conda environment for running snorkel can be found in  ```snorkel.environment.yml```
 
 # Running Snorkel
+Note that each script has detailed instructions in its opening comment.
+
+## snorkel_spam_test
+To get a sense of how snorkel works and run a quick data labeling tutorial, utilize these files. More info can be found here: https://www.snorkel.org/use-cases/01-spam-tutorial
+
+## labeled_data.csv
+Dataset of labeled biomimicry data
+
+## biomimicry_functions_enumerated.csv
+Contains all 100 of the biomimicry functions labeled 0-99. These numbers are what snorkel recognizes in place of a biomimicry function, e.g. 'attach_permanently' = 0.
+
+## biomimicry_function_rules.csv
+Contains rules for 40 of the 100 biomimicry functions. For example, the function 'attach permanently', contains the keyword rules 'attach firmly', 'biological adhesive', and 'biological glue'.
+
+## utils.py
+Takes in data from ```labeled_data.csv``` and applies a -1 'abstain' label to each row as a default, and performs a train/test/split of the data.
+
+## create_labeling_functions.py
+Create keyword labeling functions (lfs) for every rule in ```biomimicry_function_rules.csv```
+
+## petal_snorkel.py
+
+
 
 
 
