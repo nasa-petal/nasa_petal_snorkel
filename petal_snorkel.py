@@ -23,8 +23,8 @@ df_train, df_test = load_dataset()
 # df_train = df_train.fillna("")
 Y_test = df_test.label.values
 
-#get lfs
-from snorkel_paht import *
+#get labeling functions (lfs)
+from create_labeling_functions import *
 labeling_function_list = create_labeling_functions(r'./biomimicry_functions_enumerated.csv', r'./biomimicry_function_rules.csv')
 
 len(labeling_function_list)
