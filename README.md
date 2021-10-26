@@ -9,6 +9,8 @@ This README was last updated on 29 October 2021.
 
 # Files
 
+```snorkel.environment.yml``` environment for running snorkel with required dependencies
+
 ```petal_snorkel.py``` Main file for running snorkel
 
 ```petal_snorkel.ipynb``` Jupyter notebook for running snorkel
@@ -24,5 +26,11 @@ This README was last updated on 29 October 2021.
 ```snorkel_spam_test``` folder containing all the files needed to run a short test of snorkel using a spam YouTube dataset. More details here: https://www.snorkel.org/use-cases/01-spam-tutorial
 
 # Getting Started
+## Environment and setup
+
+Snorkel requires Python 3.6 or later. The entire conda environment for running snorkel can be found in  ```snorkel.environment.yml```
+
+# Running Snorkel
+
 
 
