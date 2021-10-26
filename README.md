@@ -1,12 +1,15 @@
 ![nasa-logo-web-rgb](https://user-images.githubusercontent.com/68359251/138969060-f239955e-e5a3-4633-88d7-592fcaaa3877.png)
 
-# Links
- * Bullet list
- * [Overview](#overview)
- * Future Wo
-  
+# NASA PeTaL Snorkel 
 
-# PeTaL Snorkel 
+# Links
+ * [Overview](#overview)
+ * [Files](#files)
+ * [Getting Started](#getting-started)
+ * [Running Snorkel](#running-snorkel)
+ * [Future Work](#future-work)
+ * [Contact](#contact)
+  
 ## Overview
 
 This repository contains scripts, notebooks, data, and docs used for utilizing the snorkel machine learning model. This model uses weak supervision to label large amounts of training data using programmatic labeling functions (lfs) based on keyword 'rules'.
@@ -60,6 +63,8 @@ Create keyword labeling functions (lfs) for every rule in ```biomimicry_function
 ## petal_snorkel.py
 
 # Future Work
+ * Integrating with Petal project
+ * Etc
 
 # Contact
 For questions contact Alexandra Ralevski (alexandra.ralevski@gmail.com)
