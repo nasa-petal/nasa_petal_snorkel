@@ -1,3 +1,5 @@
+![nasa-logo-web-rgb](https://user-images.githubusercontent.com/68359251/138969060-f239955e-e5a3-4633-88d7-592fcaaa3877.png)
+
 # PeTaL Snorkel 
 ## Overview
 
