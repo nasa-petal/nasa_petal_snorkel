@@ -1,5 +1,3 @@
-![alt text](https://www.google.com/url?sa=i&url=https%3A%2F%2Fpngio.com%2Fimages%2Fpng-a894871.html&psig=AOvVaw1UAw0NapSYbfxPiCsKiVeX&ust=1635372892740000&source=images&cd=vfe&ved=0CAsQjRxqFwoTCODdnvWM6fMCFQAAAAAdAAAAABAI)
-
 # PeTaL Snorkel 
 ## Overview
 
