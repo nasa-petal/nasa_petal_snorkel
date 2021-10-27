@@ -66,10 +66,10 @@ Create keyword labeling functions (lfs) for every rule in ```biomimicry_function
 ## petal_snorkel.py
 
 # More Information
-[Snorkel Flow](https://snorkel.ai/)
-[Snorkel Resources](https://www.snorkel.org/resources/)
+ * [Snorkel Flow](https://snorkel.ai/)
+ * [Snorkel Resources](https://www.snorkel.org/resources/)
 
-Notable papers:
+## Notable papers:
  * [Snorkel: Rapid Training Data Creation with Weak Supervision](https://arxiv.org/abs/1711.10160)
  * [Data Programming: Creating Large Training Sets, Quickly](https://arxiv.org/abs/1605.07723)
 
