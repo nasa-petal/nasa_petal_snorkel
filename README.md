@@ -9,6 +9,7 @@
  * [Files](#files)
  * [Getting Started](#getting-started)
  * [Running Snorkel](#running-snorkel)
+ * [More Informaion](#more-information)
  * [Future Work](#future-work)
  * [Contact](#contact)
   
@@ -63,6 +64,14 @@ Takes in data from ```labeled_data.csv``` and applies a -1 'abstain' label to ea
 Create keyword labeling functions (lfs) for every rule in ```biomimicry_function_rules.csv```
 
 ## petal_snorkel.py
+
+# More Information
+[Snorkel Flow](https://snorkel.ai/)
+[Snorkel Resources](https://www.snorkel.org/resources/)
+
+Notable papers:
+ * [Snorkel: Rapid Training Data Creation with Weak Supervision](https://arxiv.org/abs/1711.10160)
+ * [Data Programming: Creating Large Training Sets, Quickly](https://arxiv.org/abs/1605.07723)
 
 # Future Work
  * Integrating with Petal project
