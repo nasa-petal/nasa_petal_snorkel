@@ -3,7 +3,7 @@ from snorkel.labeling import LabelingFunction
 import itertools
 import math
 from snorkel.labeling.lf.core import labeling_function
-
+import numpy as np 
 '''
     Useful Functions 
 '''
@@ -23,10 +23,10 @@ def keyword_lookup(x,bio_functions:pd.DataFrame,bio_function_rules:pd.DataFrame)
         label_rule_name = label_name + "_rules"
         if label_rule_name in list(bio_function_rules.columns):
             phrases_to_look_for = bio_function_rules[label_rule_name].to_list()
-            phrases_to_look_for = [x for x in phrases_to_look_for if x == 'nan']
+            phrases_to_look_for = [p for p in phrases_to_look_for if type(p) == str]
             for phrase in phrases_to_look_for:
                 # now you could make a counter and see the percentage match so if 10/20 phrases are in the text/abstract then you return the
-                if phrase in x.text.lower():     
+                if phrase.lower() in x.text.lower():     
                     return label_id 
     return -1
 

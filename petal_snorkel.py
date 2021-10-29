@@ -8,7 +8,8 @@
 # <ARalevski, 10-17-2021, updated cardinality>
 # Authors: alexandra.ralevski@gmail.com, paht.juangphanich@nasa.gov
 # ------------------------------------------------- #
-
+import sys
+sys.path.insert(0,'../snorkel')
 from snorkel.labeling.model import LabelModel
 from snorkel.labeling import PandasLFApplier
 from snorkel.labeling import LFAnalysis
@@ -48,8 +49,8 @@ if os.path.exists('lf_analysis.pickle'):
 majority_model = MajorityLabelVoter()
 preds_train = majority_model.predict(L=L_train)
 
-label_model = LabelModel(cardinality=665, verbose=True, device = 'gpu')
-label_model.fit(L_train=L_train, n_epochs=500, log_freq=100, seed=123)
+label_model = LabelModel(cardinality=50, verbose=True, device = 'cpu')
+label_model.fit(L_train=L_train, n_epochs=20, log_freq=100, seed=123)
 
 LFAnalysis(L=L_train, lfs=labeling_function_list).lf_summary()
 
