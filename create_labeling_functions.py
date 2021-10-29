@@ -7,6 +7,7 @@ import numpy as np
 '''
     Useful Functions 
 '''
+@labeling_function()
 def keyword_lookup(x,bio_functions:pd.DataFrame,bio_function_rules:pd.DataFrame):
     """Returns the id corresponding to the label
 

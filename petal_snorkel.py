@@ -46,11 +46,11 @@ if os.path.exists('lf_analysis.pickle'):
         L_train = data['L_train']
         L_test = data['L_test']
 
-majority_model = MajorityLabelVoter()
+majority_model = MajorityLabelVoter(cardinality=98)
 preds_train = majority_model.predict(L=L_train)
 
-label_model = LabelModel(cardinality=50, verbose=True, device = 'cpu')
-label_model.fit(L_train=L_train, n_epochs=20, log_freq=100, seed=123)
+label_model = LabelModel(cardinality=98, verbose=True, device = 'cpu')
+label_model.fit(L_train=L_train, n_epochs=1000, log_freq=100, seed=123)
 
 LFAnalysis(L=L_train, lfs=labeling_function_list).lf_summary()
 
