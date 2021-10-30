@@ -7,29 +7,21 @@ import numpy as np
 '''
     Useful Functions 
 '''
-@labeling_function()
-def keyword_lookup(x,bio_functions:pd.DataFrame,bio_function_rules:pd.DataFrame):
+def keyword_lookup(x,phrase_to_match:str, label_id:int):
     """Returns the id corresponding to the label
 
     Args:
-        x (str): some phrase
+        phrase_to_match (str): some phrase that we need to match
+        label_id (int): id of label to use for this match
 
     Returns:
-        int: the id
+        (int): label id if match or -1 if no match 
     """
-    for i in range(len(bio_functions)):
-        label_name = bio_functions.iloc[i]['function'] 
-        label_id = bio_functions.iloc[i]['function_enumerated']        
+    if phrase_to_match.lower() in x.text.lower():     
+        return label_id
+    else:
+        return -1
         
-        label_rule_name = label_name + "_rules"
-        if label_rule_name in list(bio_function_rules.columns):
-            phrases_to_look_for = bio_function_rules[label_rule_name].to_list()
-            phrases_to_look_for = [p for p in phrases_to_look_for if type(p) == str]
-            for phrase in phrases_to_look_for:
-                # now you could make a counter and see the percentage match so if 10/20 phrases are in the text/abstract then you return the
-                if phrase.lower() in x.text.lower():     
-                    return label_id 
-    return -1
 
 '''
     Main Code 
@@ -49,34 +41,35 @@ def create_labeling_functions(bio_file:pd.DataFrame, bio_rules:pd.DataFrame):
     bio_file = pd.read_csv(bio_file)
     bio_rules = pd.read_csv(bio_rules)
 
-    lst = []
-    underscore_list = []
-    rules_no_na = []
-    labeling_function_list = []
+    names_used = list()
+    labeling_function_list = list()
     
     #get a list of all the rules
     for i in range(len(bio_file)):
-        label_name = bio_file.iloc[i]['function'] 
+
+        label_name = bio_file.iloc[i]['function']
+        label_id = bio_file.iloc[i]['function_enumerated']
         label_rule_name = label_name + "_rules"
+
         if label_rule_name in list(bio_rules.columns):
+            underscore_list = []
             phrases_lst = bio_rules[label_rule_name].to_list()
-            lst.append(phrases_lst)
-    chained_lst = (list(itertools.chain.from_iterable(lst)))
-    #remove blank cells
-    remove_na = [x for x in chained_lst if pd.isnull(x) == False]
-    #remove duplicates
-    for rule in remove_na:
-        if rule not in rules_no_na:
-            rules_no_na.append(rule)
-    #add underscore to rules
-    for item in rules_no_na:
-        item = item.replace(" ", "_")
-        underscore_list.append(item)
-    #create labeling function for each rule
-    for phrase in underscore_list:
-        labeling_function = LabelingFunction(name=f"keyword_{phrase}", f=keyword_lookup,
-                        resources={"bio_functions":bio_file,"bio_function_rules":bio_rules})
-        labeling_function_list.append(labeling_function)
+            
+            #remove blank cells and keep unique values 
+            rules_no_na = list(set([x for x in phrases_lst if not pd.isnull(x)]))
+            
+            #add underscore to rules
+            for item in rules_no_na:
+                item = item.replace(" ", "_")
+                underscore_list.append(item)
+            #create labeling function for each rule
+            for phrase in underscore_list:
+                function_name = f"keyword_{label_id}_{phrase}"
+                if (function_name not in names_used):
+                    labeling_function = LabelingFunction(name=function_name, f=keyword_lookup,
+                                    resources={"phrase_to_match":phrase, "label_id":label_id})
+                    labeling_function_list.append(labeling_function)
+                    names_used.append(function_name)
     
     return labeling_function_list
     
