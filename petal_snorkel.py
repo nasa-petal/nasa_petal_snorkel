@@ -27,7 +27,7 @@ Y_test = df_test.label.values
 from create_labeling_functions import *
 
 bio_file = pd.read_csv(r'biomimicry_functions_enumerated_small.csv')
-bio_rules = pd.read_csv(r'./biomimicry_function_rules_small.csv')
+bio_rules = pd.read_csv(r'biomimicry_function_rules_small.csv')
 labeling_function_list = create_labeling_functions(bio_file,bio_rules)
 
 len(labeling_function_list)
@@ -65,7 +65,7 @@ if os.path.exists('lf_analysis.pickle'):
         L_train = data['L_train']
         L_test = data['L_test']
 
-majority_model = MajorityLabelVoter(cardinality=98)
+majority_model = MajorityLabelVoter(cardinality=10)
 preds_train = majority_model.predict(L=L_train)
 
 label_model = LabelModel(cardinality=98, verbose=True, device = 'cpu')

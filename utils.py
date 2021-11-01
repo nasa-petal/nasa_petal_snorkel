@@ -3,7 +3,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 
 def load_dataset(load_train_labels: bool = False, split_dev_valid: bool = False):
-    filename = r"labeled_data_small.csv"
+    filename = r'labeled_data_small.csv'
     df = pd.read_csv(filename)
     #lowercase column names
     df.columns = map(str.lower, df.columns)
