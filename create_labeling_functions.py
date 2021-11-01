@@ -38,8 +38,6 @@ def create_labeling_functions(bio_file:pd.DataFrame, bio_rules:pd.DataFrame):
     Returns:
         labeling_function_list: a list of all the labeling function 'rules' corresponding to each biomimicry function
     """
-    bio_file = pd.read_csv(bio_file)
-    bio_rules = pd.read_csv(bio_rules)
 
     names_used = list()
     labeling_function_list = list()

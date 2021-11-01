@@ -25,7 +25,10 @@ Y_test = df_test.label.values
 
 #get labeling functions (lfs)
 from create_labeling_functions import *
-labeling_function_list = create_labeling_functions(r'./biomimicry_functions_enumerated.csv', r'./biomimicry_function_rules.csv')
+
+bio_file = pd.read_csv(r'./biomimicry_functions_enumerated.csv')
+bio_rules = pd.read_csv(r'./biomimicry_function_rules.csv')
+labeling_function_list = create_labeling_functions(bio_file,bio_rules)
 
 len(labeling_function_list)
 
@@ -34,6 +37,22 @@ if not os.path.exists('lf_analysis.pickle'):
     # define train and test sets
     L_train = applier.apply(df=df_train)
     L_test = applier.apply(df=df_test)
+    
+    '''
+        Here is where we reapply labeling functions and drop columns
+    '''
+    bio_file.columns
+    bio_file.drop()
+    bio_rules
+
+
+    
+    labeling_function_list = create_labeling_functions(bio_file,bio_rules)
+    applier = PandasLFApplier(lfs=labeling_function_list)
+    # define train and test sets
+    L_train = applier.apply(df=df_train)
+    L_test = applier.apply(df=df_test)
+
 
     df = LFAnalysis(L=L_train, lfs=labeling_function_list).lf_summary()
     with open('lf_analysis.pickle','wb') as f:
