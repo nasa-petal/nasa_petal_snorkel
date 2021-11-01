@@ -70,11 +70,11 @@ Create keyword labeling functions (lfs) for every rule in ```biomimicry_function
 ## Notable papers
  * [Snorkel: Rapid Training Data Creation with Weak Supervision](https://arxiv.org/abs/1711.10160)
  * [Data Programming: Creating Large Training Sets, Quickly](https://arxiv.org/abs/1605.07723)
- * [Learning the Structure of Generative Models without Labeled Data](https://arxiv.org/abs/1703.00854)
+ * [Practical Weak Supervision](https://learning.oreilly.com/library/view/practical-weak-supervision/9781492077053/)
 
 # Future Work
- * Integrating with Petal project
- * Etc
+ * Modifying snorkel to work with multiple labels simultaneously 
+ * Expanding the labeling functions to include all 99 biomimicry functions
 
 # Contact
 For questions contact Alexandra Ralevski (alexandra.ralevski@gmail.com)
