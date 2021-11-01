@@ -65,7 +65,7 @@ if os.path.exists('lf_analysis.pickle'):
         L_train = data['L_train']
         L_test = data['L_test']
 
-majority_model = MajorityLabelVoter(cardinality=10)
+majority_model = MajorityLabelVoter(cardinality=9)
 preds_train = majority_model.predict(L=L_train)
 
 label_model = LabelModel(cardinality=98, verbose=True, device = 'cpu')
