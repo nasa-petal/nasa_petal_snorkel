@@ -47,13 +47,13 @@ Note that each script has detailed instructions in its opening comment.
 Get a sense of how snorkel works and run a quick data labeling tutorial using a YouTube spam comments dataset. More info can be found here: https://www.snorkel.org/use-cases/01-spam-tutorial
 
 ## labeled_data.csv
-Dataset of labeled biomimicry data
+Dataset of labeled biomimicry data. Includes: doi, url, title, abstract, URL, journal, and level1/2/3 biomimicry labels.
 
 ## biomimicry_functions_enumerated.csv
-Contains all 100 of the biomimicry functions labeled 0-99. These numbers are what snorkel recognizes in place of a biomimicry function, e.g. 'attach_permanently' = 0.
+Contains all 100 biomimicry functions labeled 0-99. These numbers are what snorkel recognizes in place of a biomimicry function, e.g. 'attach_permanently' = 0.
 
 ## biomimicry_function_rules.csv
-Contains rules for 40 of the 100 biomimicry functions. For example, the function 'attach permanently', contains the keyword rules 'attach firmly', 'biological adhesive', and 'biological glue'.
+Contains rules for 40 of the 100 biomimicry functions. For example, the function 'attach permanently', contains keyword rules such as 'attach firmly', 'biological adhesive', and 'biological glue'.
 
 ## utils.py
 Takes in data from ```labeled_data.csv``` and applies a -1 'abstain' label to each row as a default, and performs a train/test/split of the data.
@@ -74,7 +74,7 @@ Create keyword labeling functions (lfs) for every rule in ```biomimicry_function
 
 # Future Work
  * Modifying snorkel to work with multiple labels simultaneously 
- * Expanding the labeling functions to include all 99 biomimicry functions
+ * Writing rules for the remaining 60 biomimicry functions
 
 # Contact
 For questions contact Alexandra Ralevski (alexandra.ralevski@gmail.com)
