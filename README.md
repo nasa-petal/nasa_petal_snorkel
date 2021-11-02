@@ -65,6 +65,7 @@ Takes in data from ```labeled_data.csv``` and applies a -1 'abstain' label to ea
 Create keyword labeling functions (lfs) for every rule in ```biomimicry_function_rules.csv```
 
 ## petal_snorkel.py
+Trains the snorkel model and returns a confidence score for each label.
 
 # More Information
  * [Snorkel Flow](https://snorkel.ai/)
@@ -76,7 +77,7 @@ Create keyword labeling functions (lfs) for every rule in ```biomimicry_function
  * [Practical Weak Supervision](https://learning.oreilly.com/library/view/practical-weak-supervision/9781492077053/)
 
 # Future Work
- * Modifying snorkel to work with multiple labels simultaneously 
+ * Dividing snorkel into multiple models that each handle a subset (~20) of functions to increase computing efficiency.
  * Writing rules for the remaining 60 biomimicry functions
 
 # Contact
