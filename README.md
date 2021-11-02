@@ -1,4 +1,4 @@
-# Labeling Training Data for NASA PeTaL (Periodic Table of Life)
+# Labeling Training Data for NASA PeTaL (Periodic Table of Life) Project
 
 [NASA PeTaL Project GitHub](https://github.com/nasa-petal)
 
