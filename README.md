@@ -49,7 +49,8 @@ Note that each script has detailed instructions in its opening comment.
 Get a sense of how snorkel works and run a quick data labeling tutorial using a YouTube spam comments dataset. More info can be found here: https://www.snorkel.org/use-cases/01-spam-tutorial
 
 ## labeled_data.csv
-Dataset of labeled biomimicry data. Includes: doi, url, title, abstract, URL, journal, and level1/2/3 biomimicry labels.
+Dataset of labeled biomimicry data. 
+Includes: doi, url, title, abstract, URL, journal, and level1/2/3 biomimicry labels.
 
 ## biomimicry_functions_enumerated.csv
 Contains all 100 biomimicry functions labeled 0-99. These numbers are what snorkel recognizes in place of a biomimicry function, e.g. 'attach_permanently' = 0.
