@@ -17,7 +17,7 @@ The NASA PeTaL (Periodic Table of Life) Project is an open source artificial int
 
 This repository contains scripts, notebooks, data, and docs used for utilizing the snorkel machine learning model. This model uses weak supervision to label large amounts of training data using programmatic labeling functions (lfs) based on keyword 'rules'.
 
-This README was last updated on 29 October 2021.
+This README was last updated on 2 November 2021.
 
 # Files
 
