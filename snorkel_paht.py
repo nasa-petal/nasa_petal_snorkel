@@ -2,7 +2,6 @@ import pandas as pd
 from snorkel.labeling import LabelingFunction
 import itertools
 import math
-from snorkel.labeling.lf.core import labeling_function
 
 '''
     Useful Functions 
