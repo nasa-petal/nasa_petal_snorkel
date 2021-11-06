@@ -56,7 +56,7 @@ Includes: doi, url, title, abstract, URL, journal, and level1/2/3 biomimicry lab
 Contains all 100 biomimicry functions labeled 0-99. These numbers are what snorkel recognizes in place of a biomimicry function, e.g. 'attach_permanently' = 0.
 
 ## biomimicry_function_rules.csv
-Contains rules for 40 of the 100 biomimicry functions. For example, the function 'attach permanently', contains keyword rules such as 'attach firmly', 'biological adhesive', and 'biological glue'.
+Contains 661 rules representing 40 of the 100 biomimicry functions. For example, the function 'attach permanently', contains keyword rules such as 'attach firmly', 'biological adhesive', and 'biological glue'.
 
 ## utils.py
 Takes in data from ```labeled_data.csv``` and applies a -1 'abstain' label to each row as a default, and performs a train/test/split of the data.
