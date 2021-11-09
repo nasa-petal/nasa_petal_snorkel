@@ -56,7 +56,7 @@ Note that each script has detailed instructions in its opening comment.
 Get a sense of how snorkel works and run a quick data labeling tutorial using a YouTube spam comments dataset. More info can be found here: https://www.snorkel.org/use-cases/01-spam-tutorial
 
 ## labeled_data.csv
-Dataset of labeled biomimicry data. 
+Sample dataset of labeled biomimicry data. 
 Includes: doi, url, title, abstract, URL, journal, and level1/2/3 biomimicry labels.
 
 ## biomimicry_functions_enumerated.csv
@@ -72,7 +72,7 @@ Takes in data from ```labeled_data.csv``` and applies a -1 'abstain' label to ea
 Create keyword labeling functions (lfs) for every rule in ```biomimicry_function_rules.csv```
 
 ## petal_snorkel.py
-Trains the snorkel model and returns a confidence score for each label.
+Trains the snorkel model and returns a prediction of each label.
 
 # More Information
  * [Snorkel Flow](https://snorkel.ai/)
