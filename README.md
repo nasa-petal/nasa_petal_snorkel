@@ -32,15 +32,15 @@ This README was last updated on 9 November 2021.
 
 # Files
 
-```snorkel.environment.yml``` environment for running snorkel with required dependencies
+```snorkel.environment.yml``` environment for running snorkel with required dependencies.
 
-```petal_snorkel.py``` Main file for running snorkel
+```petal_snorkel.py``` Main file for running snorkel.
 
 ```biomimicry_function_rules.csv``` contains rules for 40 of the 100 biomimicry functions.
 
 ```biomimicry_functions_enumerated.csv``` contains all 100 of the biomimicry functions labeled 0-99.
 
-```create_labeling_functions.py``` file to create keyword labeling functions (lfs)
+```create_labeling_functions.py``` file to create keyword labeling functions (lfs).
 
 ```utils.py``` data cleaning and train/test/split of data
 
