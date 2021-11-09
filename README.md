@@ -85,7 +85,7 @@ Trains the snorkel model and returns a prediction of each label.
  * [Practical Weak Supervision](https://learning.oreilly.com/library/view/practical-weak-supervision/9781492077053/)
 
 # Future Work
- * Divide snorkel into multiple models that each handle a subset (~10) of functions to increase computing efficiency.
+ * Divide snorkel into multiple models that each handle a subset of functions to increase computing efficiency.
  * Write rules for the remaining 60 biomimicry functions.
  * Include 'regular expression' labeling functions to increase coverage.
 
