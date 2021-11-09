@@ -34,8 +34,6 @@ This README was last updated on 9 November 2021.
 
 ```petal_snorkel.py``` Main file for running snorkel
 
-```petal_snorkel.ipynb``` Jupyter notebook for running snorkel
-
 ```biomimicry_function_rules.csv``` contains rules for 40 of the 100 biomimicry functions.
 
 ```biomimicry_functions_enumerated.csv``` contains all 100 of the biomimicry functions labeled 0-99.
