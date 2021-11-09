@@ -15,12 +15,13 @@ The NASA PeTaL (Periodic Table of Life) Project is an open source artificial int
   
 ## Overview
 
+The aim of this project is to use Snorkel to build a training set of labeled biomimicry papers. Our goal is to train a classifier over the data that can predict what label a certain biomimicry paper should receive. We have access to a large amount of unlabeled data, but in order to train a classifier we need to label our data, but doing so by hand for real world applications can often be prohibitively slow and expensive. In these cases, we can turn to a weak supervision approach, using labeling functions (LFs) in Snorkel: noisy, programmatic rules and heuristics that assign labels to unlabeled training data. This repository contains scripts, notebooks, data, and docs used for utilizing the snorkel system to build a training set.
+
 <p align="center">
   <img width="1000" src="https://github.com/ARalevski/My_Portfolio/blob/main/images/snorkel_illustration_final_white_blackborder.png"
   <figcaption> An overview of the Snorkel system. (1) Subject matter experts (SME) users write labeling functions (LFs) that express weak supervision sources like distant supervision, patterns, and heuristics. (2) Snorkel applies the LFs over unlabeled data and learns a generative model to combine the LFs' outputs into probabilistic labels. (3) Snorkel uses these labels to train a discriminative classification model, such as a deep neural network. Adapted from Ratner et. al (2017).
 </p>
 
-The aim of this project is to use Snorkel to build a training set of labeled biomimicry papers. Our goal is to train a classifier over the data that can predict what label a certain biomimicry paper should receive. We have access to a large amount of unlabeled data, but in order to train a classifier we need to label our data, but doing so by hand for real world applications can often be prohibitively slow and expensive. In these cases, we can turn to a weak supervision approach, using labeling functions (LFs) in Snorkel: noisy, programmatic rules and heuristics that assign labels to unlabeled training data. This repository contains scripts, notebooks, data, and docs used for utilizing the snorkel system to build a training set.
 
 This README was last updated on 8 November 2021.
 
