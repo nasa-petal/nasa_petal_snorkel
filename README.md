@@ -15,7 +15,9 @@ The NASA PeTaL (Periodic Table of Life) Project is an open source artificial int
   
 ## Overview
 
-The aim of this project is to use Snorkel to build a training set of labeled biomimicry papers. Our goal is to train a classifier over the data that can predict what label a certain biomimicry paper should receive. We have access to a large amount of unlabeled data, but in order to train a classifier we need to label our data, but doing so by hand for real world applications can often be prohibitively slow and expensive. In these cases, we can turn to a weak supervision approach, using labeling functions (LFs) in Snorkel: noisy, programmatic rules and heuristics that assign labels to unlabeled training data. This repository contains scripts, notebooks, data, and docs used for utilizing the snorkel system to build a training set.
+The aim of this project is to use Snorkel to build a training set of labeled biomimicry papers. Our goal is to train a classifier over the data that can predict what label a certain biomimicry paper should receive. We have access to a large amount of unlabeled data, but in order to train a classifier we need to label our data, but doing so by hand for real world applications can often be prohibitively slow and expensive. In these cases, we can turn to a weak supervision approach, using labeling functions (LFs) in Snorkel. LFs are noisy, programmatic rules and heuristics that assign labels to unlabeled training data.
+
+This repository contains scripts, notebooks, data, and docs used for utilizing the snorkel system to build a training set.
 
 <p align="center">
   <img width="1000" src="https://github.com/ARalevski/My_Portfolio/blob/main/images/snorkel_illustration_final_white_blackborder.png"
@@ -25,6 +27,7 @@ The aim of this project is to use Snorkel to build a training set of labeled bio
 
 
 This README was last updated on 8 November 2021.
+
 
 # Files
 
