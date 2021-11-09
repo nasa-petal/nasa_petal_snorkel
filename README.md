@@ -52,7 +52,6 @@ This README was last updated on 9 November 2021.
 Snorkel requires Python 3.6 or later. The entire conda environment for running snorkel can be found in  ```snorkel.environment.yml```
 
 # Running Snorkel
-Note that each script has detailed instructions in its opening comment.
 
 ## snorkel_spam_test
 Get a sense of how snorkel works and run a quick data labeling tutorial using a YouTube spam comments dataset. More info can be found here: https://www.snorkel.org/use-cases/01-spam-tutorial
