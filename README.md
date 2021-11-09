@@ -1,4 +1,4 @@
-# Labeling Training Data for NASA PeTaL Project
+# Generating Training Data Using Weak Supervision for the NASA PeTaL Project
 
 The NASA PeTaL (Periodic Table of Life) Project is an open source artificial intelligence design tool that leverages data and information from nature and technology to advance biomimicry R&D.
 
