@@ -40,7 +40,7 @@ def load_dataset(load_train_labels: bool = False, split_dev_valid: bool = False)
 
 
 
-def smaller_models(L_match:np.ndarray,nLabelsPerGroup:int, nOverlap:int, labels_list:Dict[int,str]) -> List[pd.DataFrame]:
+def smaller_models(L_match:np.ndarray,nLabelsPerGroup:int, nOverlap:int, labels_list:Dict[int,str],df:pd.DataFrame) -> List[pd.DataFrame]:
     """Code to construct smaller snorkel models from a larger one. This will help divide the data from models that, for example, pick 16 labels to something that predicts 5 labels 3 are unique to the model and 1 is overlap with another model and the other label is NOT LABELS 1-4
 
     Args:
@@ -48,13 +48,18 @@ def smaller_models(L_match:np.ndarray,nLabelsPerGroup:int, nOverlap:int, labels_
         nLabelsPerGroup (int): number of labels per group 
         nOverlap (int): number of overlaping labels. Defaults to > 5
         labels_list (Dict[int,str]): mapping of label to string
+        df (pd.DataFrame): Pandas dataframe with all the data 
 
     Returns:
         (tuple): containing
             
             Labels_overlap (List[List[int]]): List of labels with overlap
             L_matches (List[np.ndarray]): List of sub L_matches specific to each Labels_overlap list 
-            translations (List[Dict[int,int]]): translations to normalize both 
+            translations (List[Dict[int,int]]): For each model this can be used to convert the new labels to the old labels id's 
+            translators_to_str (List[Dict[int,str]]): For each model this can be used to convert the key representing the label to a string with the prediction. 
+            L_match (np.ndarray): This is the new Lmatch with unique values occuring in ascending order, no skips
+            global_translator (Dict[int,int]): Used to convert old labels to new labels for L_match
+            dfs (List[pd.DataFrame]): List of dataframes
     """
     assert nLabelsPerGroup+1-nOverlap>2, "Need to have 2+ unique labels per group."
 
@@ -100,18 +105,29 @@ def smaller_models(L_match:np.ndarray,nLabelsPerGroup:int, nOverlap:int, labels_
 
     # Restructure L_match
     L_matches = list() # List of all the matches 
+    dfs = list()
     translators = list()
     translators_to_str = list()
     for lo in labels_overlap:
         translators.append(dict(zip(lo, range(len(lo)))))
         translators_to_str.append(dict(zip(range(len(lo)), itemgetter(*lo)(labels_list))))
         L_match_mini = list()
-        for i in range(L_match.shape[0]): # Find all instances inside L_match that contain matches for labels in lo
-            unique = np.unique(L_match[i,:]).tolist() # Look at all the rules where this one matches 
-            if any(item in lo for item in unique): # any item in lo is in unique
+
+        '''
+            Note: Below we search L_match matrix for any row that matches lo. lo can be labels [0,1,6,7,8] 
+            If any row matches these labels, it is automatically added to L_match mini
+
+            The key is to end up with a matrix that contains -1,0,1,6,7,8 and a model that can predict this
+        '''
+        df_index = list()
+        for i in range(L_match.shape[0]):               # Find all instances inside L_match that contain matches for labels in lo
+            unique = np.unique(L_match[i,:]).tolist()   # Look at all the rules where this one matches 
+            if any(item in lo for item in unique):      # any item in lo is in unique
                 L_match_mini.append([lm if lm in lo else -1 for lm in L_match[i,:]])
+                df_index.append(i)
         L_matches.append(np.array([np.array(xi) for xi in L_match_mini]))
-    
+        dfs.append(df.iloc[df_index])
+
     # Add in -1 to all the labels
     for i in range(len(labels_overlap)):
         labels_overlap[i].insert(0,-1)
@@ -135,4 +151,4 @@ def smaller_models(L_match:np.ndarray,nLabelsPerGroup:int, nOverlap:int, labels_
     for key,value in global_translator.items():
         L_match = np.where(L_match == key, value, L_match)
         
-    return labels_overlap, L_matches, translators, translators_to_str, L_match, global_translator
+    return labels_overlap, L_matches, translators, translators_to_str, L_match, global_translator, dfs

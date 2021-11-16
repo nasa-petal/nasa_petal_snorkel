@@ -17,8 +17,12 @@ from snorkel.labeling.model import MajorityLabelVoter
 from snorkel.labeling import filter_unlabeled_dataframe
 from utils import smaller_models
 from create_labeling_functions import create_labeling_functions
-import pickle, os
+from tqdm import trange
 import pandas as pd 
+
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
 
 #import csv file and load train/test/split of dataset
 from utils import load_dataset
@@ -32,9 +36,48 @@ labels = dict(zip(df_bio['function_enumerated'].tolist(),df_bio['function'].toli
 
 applier = PandasLFApplier(lfs=labeling_function_list)
 L_match = applier.apply(df=df)
-smaller_models(L_match,5,2,labels_list=labels)
+labels_overlap, L_matches, translators, translators_to_str, L_match, global_translator,dfs = smaller_models(L_match,5,2,labels_list=labels,df=df)
 
+'''
+    Loop to evaluate all the smaller models
+    Note: some models are very small to splitting them into test and train can be tricky 
+'''
+models = list()
+for i in trange(len(L_matches)):
+    L_match = L_matches[i]
+    # TODO split the dataset so theres an equal amount of all labels
+    L_train = L_match
+    L_test = L_match 
 
+    labels = labels_overlap[i]
+    cardinality = len(labels)   # How many labels to predict 
+    majority_model = MajorityLabelVoter(cardinality=cardinality)
+    preds_train = majority_model.predict(L=L_train)
+    
+    # Train LabelModel - this outputs probabilistic floats 
+    label_model = LabelModel(cardinality=cardinality, verbose=True, device = 'cpu')
+    label_model.fit(L_train=L_train, n_epochs=100, log_freq=10, seed=123)
+    probs_train = label_model.predict_proba(L=L_train)
+    
+    df_train_filtered, probs_train_filtered = filter_unlabeled_dataframe(X=dfs[i], y=probs_train, L=L_match)
+    vectorizer = CountVectorizer(ngram_range=(1, 5))
+    X_train = vectorizer.fit_transform(df_train_filtered.text.tolist())
+    X_test = vectorizer.transform(df_test.text.tolist())
+
+    preds_train_filtered = probs_to_preds(probs=probs_train_filtered)
+    sklearn_model = LogisticRegression(C=1e3, solver="liblinear")
+    sklearn_model.fit(X=X_train, y=preds_train_filtered)
+
+    models.append(label_model)
+
+    majority_acc = majority_model.score(L=L_test, Y=Y_test, tie_break_policy="random")["accuracy"]
+    label_model_acc = label_model.score(L=L_test, Y=Y_test, tie_break_policy="random")["accuracy"]
+
+    print("check")
+
+'''
+    Loop to evaluate the larger model
+'''
 
 #     df = LFAnalysis(L=L_train, lfs=labeling_function_list).lf_summary()
 #     with open('lf_analysis.pickle','wb') as f:
