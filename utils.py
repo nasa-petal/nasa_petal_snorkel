@@ -41,7 +41,7 @@ def load_dataset(load_train_labels: bool = False, split_dev_valid: bool = False)
 
 
 def smaller_models(L_match:np.ndarray,nLabelsPerGroup:int, nOverlap:int, labels_list:Dict[int,str],df:pd.DataFrame) -> List[pd.DataFrame]:
-    """Code to construct smaller snorkel models from a larger one. This will help divide the data from models that, for example, pick 16 labels to something that predicts 5 labels 3 are unique to the model and 1 is overlap with another model and the other label is NOT LABELS 1-4
+    """Code to construct smaller snorkel models from a larger one. This will help divide the data from models that, for example, we take a large dataset containing 16 labels and break it down into a smaller dataset that that predicts 5 labels; 3 labels are unique to the model and 1 label overlaps with another model and the other remaining label (-1) is the "I don't know what label this paper is" I call this the consensus data model approach
 
     Args:
         L_match (np.ndarray): This comes from  applier = PandasLFApplier(lfs=labeling_function_list); L_match = applier.apply(df=df_train). Dimensions = (#PAPERS, FUNCTIONS RULES)

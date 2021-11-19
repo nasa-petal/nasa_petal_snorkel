@@ -15,6 +15,7 @@ from snorkel.labeling import PandasLFApplier
 from snorkel.labeling import LFAnalysis
 from snorkel.labeling.model import MajorityLabelVoter
 from snorkel.labeling import filter_unlabeled_dataframe
+from snorkel.utils import probs_to_preds
 from utils import smaller_models
 from create_labeling_functions import create_labeling_functions
 from tqdm import trange
@@ -52,28 +53,28 @@ for i in trange(len(L_matches)):
     labels = labels_overlap[i]
     cardinality = len(labels)   # How many labels to predict 
     majority_model = MajorityLabelVoter(cardinality=cardinality)
-    preds_train = majority_model.predict(L=L_train)
+    preds_train = majority_model.predict(L=L_train)                 # Looks at each text and sees which label is predicted the most 
     
     # Train LabelModel - this outputs probabilistic floats 
     label_model = LabelModel(cardinality=cardinality, verbose=True, device = 'cpu')
-    label_model.fit(L_train=L_train, n_epochs=100, log_freq=10, seed=123)
-    probs_train = label_model.predict_proba(L=L_train)
+    label_model.fit(L_train=L_train, n_epochs=300, log_freq=50, seed=123)
+    probs_train = label_model.predict_proba(L=L_train)  # This gives you the probability of which label paper falls under 
+
+    models.append(label_model) # this label model can help predict the type of paper
     
-    df_train_filtered, probs_train_filtered = filter_unlabeled_dataframe(X=dfs[i], y=probs_train, L=L_match)
-    vectorizer = CountVectorizer(ngram_range=(1, 5))
-    X_train = vectorizer.fit_transform(df_train_filtered.text.tolist())
-    X_test = vectorizer.transform(df_test.text.tolist())
+    # *Note: This part can be replaced by scibert
+    # df_train_filtered, probs_train_filtered = filter_unlabeled_dataframe(X=dfs[i], y=probs_train, L=L_match)
+    # vectorizer = CountVectorizer(ngram_range=(1, 5))
+    # X_train = vectorizer.fit_transform(df_train_filtered.text.tolist())
+    # # X_test = vectorizer.transform(df_test.text.tolist())
 
-    preds_train_filtered = probs_to_preds(probs=probs_train_filtered)
-    sklearn_model = LogisticRegression(C=1e3, solver="liblinear")
-    sklearn_model.fit(X=X_train, y=preds_train_filtered)
+    # preds_train_filtered = probs_to_preds(probs=probs_train_filtered)
+    # sklearn_model = LogisticRegression(C=1e3, solver="liblinear")
+    # sklearn_model.fit(X=X_train, y=preds_train_filtered)
 
-    models.append(label_model)
 
-    majority_acc = majority_model.score(L=L_test, Y=Y_test, tie_break_policy="random")["accuracy"]
-    label_model_acc = label_model.score(L=L_test, Y=Y_test, tie_break_policy="random")["accuracy"]
-
-    print("check")
+    # majority_acc = majority_model.score(L=L_test, Y=Y_test, tie_break_policy="random")["accuracy"]
+    # label_model_acc = label_model.score(L=L_test, Y=Y_test, tie_break_policy="random")["accuracy"]
 
 '''
     Loop to evaluate the larger model
