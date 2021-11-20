@@ -16,6 +16,7 @@ from snorkel.labeling import LFAnalysis
 from snorkel.labeling.model import MajorityLabelVoter
 from snorkel.labeling import filter_unlabeled_dataframe
 from snorkel.utils import probs_to_preds
+import pickle
 from utils import smaller_models
 from create_labeling_functions import create_labeling_functions
 from tqdm import trange
@@ -61,7 +62,13 @@ for i in trange(len(L_matches)):
     probs_train = label_model.predict_proba(L=L_train)  # This gives you the probability of which label paper falls under 
 
     models.append(label_model) # this label model can help predict the type of paper
-    
+
+with open('lf_analysis.pickle','wb') as f:
+    pickle.dump({"Label_models":models, 'labels_overlap':labels_overlap,
+        'translators':translators,'translators_to_str':translators_to_str,
+        'L_match':L_match,'global_translator':global_translator,
+        'texts_df':dfs},f)
+
     # *Note: This part can be replaced by scibert
     # df_train_filtered, probs_train_filtered = filter_unlabeled_dataframe(X=dfs[i], y=probs_train, L=L_match)
     # vectorizer = CountVectorizer(ngram_range=(1, 5))

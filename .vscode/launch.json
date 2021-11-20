@@ -5,10 +5,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Current File",
+            "name": "Train",
             "type": "python",
             "request": "launch",
-            "program": "petal_snorkel.py",
+            "program": "petal_snorkel_train.py",
             "console": "integratedTerminal"
         }
     ]
