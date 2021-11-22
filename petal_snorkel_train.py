@@ -38,7 +38,8 @@ labels = dict(zip(df_bio['function_enumerated'].tolist(),df_bio['function'].toli
 
 applier = PandasLFApplier(lfs=labeling_function_list)
 L_match = applier.apply(df=df)
-labels_overlap, L_matches, translators, translators_to_str, L_match, global_translator,dfs = smaller_models(L_match,5,2,labels_list=labels,df=df)
+labels_overlap, L_matches, translators, translators_to_str, L_match_all, global_translator, dfs = smaller_models(L_match,5,2,labels_list=labels,df=df)
+
 
 '''
     Loop to evaluate all the smaller models
@@ -63,55 +64,18 @@ for i in trange(len(L_matches)):
 
     models.append(label_model) # this label model can help predict the type of paper
 
-with open('lf_analysis.pickle','wb') as f:
+with open('small_models_trained.pickle','wb') as f:
     pickle.dump({"Label_models":models, 'labels_overlap':labels_overlap,
         'translators':translators,'translators_to_str':translators_to_str,
-        'L_match':L_match,'global_translator':global_translator,
         'texts_df':dfs},f)
 
-    # *Note: This part can be replaced by scibert
-    # df_train_filtered, probs_train_filtered = filter_unlabeled_dataframe(X=dfs[i], y=probs_train, L=L_match)
-    # vectorizer = CountVectorizer(ngram_range=(1, 5))
-    # X_train = vectorizer.fit_transform(df_train_filtered.text.tolist())
-    # # X_test = vectorizer.transform(df_test.text.tolist())
+# Training a single large model 
+cardinality = len(global_translator)
+majority_model = MajorityLabelVoter(cardinality=cardinality)
+preds_train = majority_model.predict(L=L_match_all)
+label_model = LabelModel(cardinality=cardinality, verbose=True, device = 'cpu')
+label_model.fit(L_train=L_match_all, n_epochs=300, log_freq=50, seed=123)
 
-    # preds_train_filtered = probs_to_preds(probs=probs_train_filtered)
-    # sklearn_model = LogisticRegression(C=1e3, solver="liblinear")
-    # sklearn_model.fit(X=X_train, y=preds_train_filtered)
-
-
-    # majority_acc = majority_model.score(L=L_test, Y=Y_test, tie_break_policy="random")["accuracy"]
-    # label_model_acc = label_model.score(L=L_test, Y=Y_test, tie_break_policy="random")["accuracy"]
-
-'''
-    Loop to evaluate the larger model
-'''
-
-#     df = LFAnalysis(L=L_train, lfs=labeling_function_list).lf_summary()
-#     with open('lf_analysis.pickle','wb') as f:
-#         pickle.dump({"lf_analysis":df, 'L_train':L_train,'L_test':L_test},f)
-
-#     # Br
-# if os.path.exists('lf_analysis.pickle'):
-#     with open('lf_analysis.pickle','rb') as f:
-#         data = pickle.load(f)
-#         lf_analysis = data['lf_analysis']
-#         L_train = data['L_train']
-#         L_test = data['L_test']
-
-# majority_model = MajorityLabelVoter(cardinality=98)
-# preds_train = majority_model.predict(L=L_train)
-
-# label_model = LabelModel(cardinality=98, verbose=True, device = 'cpu')
-# label_model.fit(L_train=L_train, n_epochs=1000, log_freq=100, seed=123)
-
-# LFAnalysis(L=L_train, lfs=labeling_function_list).lf_summary()
-
-# df_train_filtered, preds_train_filtered = filter_unlabeled_dataframe(
-#     X=df_train, y=preds_train, L=L_train)
-
-# df_train["label"] = label_model.predict(L=L_train, tie_break_policy="abstain")
-
-# label_model.save("snorkel_model.pkl")
-
-# df_train.to_csv("results.csv")
+with open('large_model_trained.pickle','wb') as f:
+    pickle.dump({"Label_model":label_model,'global_translator':global_translator,'translators_to_str':translators_to_str,
+        'texts_df':df},f)

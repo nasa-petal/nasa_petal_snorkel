@@ -10,6 +10,13 @@
             "request": "launch",
             "program": "petal_snorkel_train.py",
             "console": "integratedTerminal"
+        },
+        {
+            "name": "Predict",
+            "type": "python",
+            "request": "launch",
+            "program": "petal_snorkel_predict.py",
+            "console": "integratedTerminal"
         }
     ]
 }

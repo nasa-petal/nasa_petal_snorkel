@@ -87,22 +87,20 @@ def smaller_models(L_match:np.ndarray,nLabelsPerGroup:int, nOverlap:int, labels_
         labels.append(label)
     # Lets add the overlap
     labels_overlap = list() 
-    for n in range(nOverlap):
-        if n == 0:
-            for i in range(len(labels)):
-                for u in unique_labels:
-                    if u not in labels[i]:
-                        labels_overlap.append(deepcopy(labels[i]))
-                        labels_overlap[-1].append(u)
-        else:
-            for lo in range(len(labels_overlap)):
-                for u in unique_labels:
-                    if u not in labels_overlap[lo]:
-                        labels_overlap[lo].append(u)
-                        unique_labels.remove(u)
-                        break
-        unique_labels = deepcopy(unique_labels_backup)   
-
+    unique_labels_used = list()
+    for i in range(len(labels)):
+        labels_overlap.append(deepcopy(labels[i]))
+        overlap_counter = 0
+        for u in unique_labels:
+            if u not in labels[i] and u not in unique_labels_used:
+                labels_overlap[-1].append(u)
+                unique_labels_used.append(u)
+                overlap_counter+=1
+            if overlap_counter==nOverlap:
+                break
+    unused_unique_labels = [u for u in unique_labels if u not in unique_labels_used]
+    labels_overlap.append(unused_unique_labels)
+    
     # Restructure L_match
     L_matches = list() # List of all the matches 
     dfs = list()
