@@ -6,7 +6,7 @@
 from copy import deepcopy
 import sys
 from types import LambdaType
-from typing import Dict
+from typing import Dict, List
 sys.path.insert(0,'../snorkel')
 from snorkel.labeling.model import LabelModel
 from snorkel.labeling import PandasLFApplier
@@ -51,116 +51,78 @@ if osp.exists(large_model):
     with open(large_model,'rb') as f:
         large_model_data = pickle.load(f)
 
+def evaluate_models(label_models:List, translators_to_str:List):
+    """Evaluates small models using Alex dataset 
+
+    Args:
+        label_models (List): List of label models from snorkel 
+        translators_to_str (List): list of dictionaries translating matches to strings 
+
+    Returns:
+        [type]: [description]
+    """
+    # Create a copy of the all labels dictionary for each paper
+    results_for_each_paper = list()
+    for p in trange(L_match.shape[0]):
+        L = L_match[p,:].reshape(1,-1)
+        results_for_each_paper.append({ 
+                'title':df.iloc[p]['title'], 'abstract':df.iloc[p]['abstract'],
+                'doi':df.iloc[p]['doi']})
+        if not pd.isna(df.iloc[p]['label_level_1']):
+            results_for_each_paper[p]['label'] = ast.literal_eval(df.iloc[p]['label_level_1'])
+        else:
+            results_for_each_paper[p]['label'] = 'not found'
+
+        results_for_each_paper[p]['label-snorkel-1'] = ''
+        results_for_each_paper[p]['label-snorkel-2'] = ''
+        results_for_each_paper[p]['label-snorkel-3'] = ''
+        results_for_each_paper[p]['probability-snorkel-1'] = 0
+        results_for_each_paper[p]['probability-snorkel-2'] = 0
+        results_for_each_paper[p]['probability-snorkel-3'] = 0
+        results_for_each_paper[p]['model-index-snorkel-1'] = 0
+        results_for_each_paper[p]['model-index-snorkel-2'] = 0
+        results_for_each_paper[p]['model-index-snorkel-3'] = 0
+        labels = list()
+        probabilities = list() 
+        model_indicies = list() 
+        for i in range(len(label_models)):
+            model = label_models[i]
+            translator = translators_to_str[i]
+            temp = evaluate_model(L, model,translator,i)
+            temp = temp[0]
+            temp_probabilities = [t['probability'] for t in temp]
+            temp_labels = [t['label'] for t in temp]
+            temp_model_indicies = [t['model_index'] for t in temp]
+            labels.extend(temp_labels)
+            probabilities.extend(temp_probabilities)
+            model_indicies.extend(temp_model_indicies)
+        
+        zipped = list(zip(probabilities,labels,model_indicies))
+        zipped = sorted(zipped, reverse=True)
+        probabilities, labels, model_indicies = zip(*zipped)
+
+        results_for_each_paper[p]['label-snorkel-1'] = labels[0]
+        results_for_each_paper[p]['label-snorkel-2'] = labels[1]
+        results_for_each_paper[p]['label-snorkel-3'] = labels[2]
+        results_for_each_paper[p]['probability-snorkel-1'] = probabilities[0]
+        results_for_each_paper[p]['probability-snorkel-2'] = probabilities[1]
+        results_for_each_paper[p]['probability-snorkel-3'] = probabilities[2]
+        results_for_each_paper[p]['model-index-snorkel-1'] = model_indicies[0]
+        results_for_each_paper[p]['model-index-snorkel-2'] = model_indicies[1]
+        results_for_each_paper[p]['model-index-snorkel-3'] = model_indicies[2]
+    return results_for_each_paper
+
 '''
     Evaluation using smaller models
 '''
-# Create a copy of the all labels dictionary for each paper
-results_for_each_paper = list()
-for p in trange(L_match.shape[0]):
-    L = L_match[p,:].reshape(1,-1)
-    results_for_each_paper.append({ 
-            'title':df.iloc[p]['title'], 'abstract':df.iloc[p]['abstract'],
-            'doi':df.iloc[p]['doi']})
-    if not pd.isna(df.iloc[p]['label_level_1']):
-        results_for_each_paper[p]['label'] = ast.literal_eval(df.iloc[p]['label_level_1'])
-    else:
-        results_for_each_paper[p]['label'] = 'not found'
-
-    results_for_each_paper[p]['label-snorkel-1'] = ''
-    results_for_each_paper[p]['label-snorkel-2'] = ''
-    results_for_each_paper[p]['label-snorkel-3'] = ''
-    results_for_each_paper[p]['probability-snorkel-1'] = 0
-    results_for_each_paper[p]['probability-snorkel-2'] = 0
-    results_for_each_paper[p]['probability-snorkel-3'] = 0
-    results_for_each_paper[p]['model-index-snorkel-1'] = 0
-    results_for_each_paper[p]['model-index-snorkel-2'] = 0
-    results_for_each_paper[p]['model-index-snorkel-3'] = 0
-    labels = list()
-    probabilities = list() 
-    model_indicies = list() 
-    label_probability = None
-    for i in range(len(smaller_model_data['Label_models'])):
-        model = smaller_model_data['Label_models'][i]
-        translator = smaller_model_data['translators_to_str'][i]
-        temp = evaluate_model(L, model,translator,i)
-        temp = temp[0]
-        temp_probabilities = [t['probability'] for t in temp]
-        temp_labels = [t['label'] for t in temp]
-        temp_model_indicies = [t['model_index'] for t in temp]
-        labels.extend(temp_labels)
-        probabilities.extend(temp_probabilities)
-        model_indicies.extend(temp_model_indicies)
-    
-    zipped = list(zip(probabilities,labels,model_indicies))
-    zipped = sorted(zipped, reverse=True)
-    probabilities, labels, model_indicies = zip(*zipped)
-
-    results_for_each_paper[p]['label-snorkel-1'] = labels[0]
-    results_for_each_paper[p]['label-snorkel-2'] = labels[1]
-    results_for_each_paper[p]['label-snorkel-3'] = labels[2]
-    results_for_each_paper[p]['probability-snorkel-1'] = probabilities[0]
-    results_for_each_paper[p]['probability-snorkel-2'] = probabilities[1]
-    results_for_each_paper[p]['probability-snorkel-3'] = probabilities[2]
-    results_for_each_paper[p]['model-index-snorkel-1'] = model_indicies[0]
-    results_for_each_paper[p]['model-index-snorkel-2'] = model_indicies[1]
-    results_for_each_paper[p]['model-index-snorkel-3'] = model_indicies[2]
-    
-# Print to a CSV
-df = pd.DataFrame(results_for_each_paper)
-df.to_csv("alex paper matches div-conquer.csv")
+# small_model_results = evaluate_models(smaller_model_data['Label_models'], smaller_model_data['translators_to_str'])
+# df_sm = pd.DataFrame(small_model_results)
+# df_sm.to_csv("alex paper matches div-conquer.csv")
 
 '''
     Evaluate using larger model
 '''
-
-# Create a copy of the all labels dictionary for each paper
-results_for_each_paper = list()
-for p in trange(L_match.shape[0]):
-    L = L_match[p,:].reshape(1,-1)
-    results_for_each_paper.append({ 
-            'title':df.iloc[p]['title'], 'abstract':df.iloc[p]['abstract'],
-            'doi':df.iloc[p]['doi']})
-    if not pd.isna(df.iloc[p]['label_level_1']):
-        results_for_each_paper[p]['label'] = ast.literal_eval(df.iloc[p]['label_level_1'])
-    else:
-        results_for_each_paper[p]['label'] = 'not found'
-
-    results_for_each_paper[p]['label-snorkel-1'] = ''
-    results_for_each_paper[p]['label-snorkel-2'] = ''
-    results_for_each_paper[p]['label-snorkel-3'] = ''
-    results_for_each_paper[p]['probability-snorkel-1'] = 0
-    results_for_each_paper[p]['probability-snorkel-2'] = 0
-    results_for_each_paper[p]['probability-snorkel-3'] = 0
-    results_for_each_paper[p]['model-index-snorkel-1'] = 0
-    results_for_each_paper[p]['model-index-snorkel-2'] = 0
-    results_for_each_paper[p]['model-index-snorkel-3'] = 0
-    labels = list()
-    probabilities = list() 
-    model_indicies = list() 
-    label_probability = None
-    for i in trange(len(large_model_data['Label_models'])):
-        model = large_model_data['Label_models'][i]
-        translator = smaller_model_data['translators_to_str'][i]
-        temp = evaluate_model(L, model,translator,i)
-        temp = temp[0]
-        sorted(temp, key = lambda i: i['probability'], reverse=True)
-        temp_probabilities = [t['probability'] for t in temp]
-        temp_labels = [t['label'] for t in temp]
-        temp_model_indicies = [t['model_index'] for t in temp]
-        labels.extend(temp_labels)
-        probabilities.extend(temp_probabilities)
-        model_indicies.extend(temp_model_indicies)
-    
-    zipped = zip(probabilities,labels,model_indicies)
-    zipped.sort(reverse=True)
-    probabilities, labels, model_indicies = zip(*zipped)
-
-    results_for_each_paper[p]['label-snorkel-1'] = labels[0]
-    results_for_each_paper[p]['label-snorkel-2'] = labels[1]
-    results_for_each_paper[p]['label-snorkel-3'] = labels[2]
-    results_for_each_paper[p]['probability-snorkel-1'] = probabilities[0]
-    results_for_each_paper[p]['probability-snorkel-2'] = probabilities[1]
-    results_for_each_paper[p]['probability-snorkel-3'] = probabilities[2]
-    results_for_each_paper[p]['model-index-snorkel-1'] = model_indicies[0]
-    results_for_each_paper[p]['model-index-snorkel-2'] = model_indicies[1]
-    results_for_each_paper[p]['model-index-snorkel-3'] = model_indicies[2]
+labels = {-1:"no_match", **labels}
+large_model_results = evaluate_models([large_model_data['Label_model']], [labels])
+df_lg = pd.DataFrame(large_model_results)
+df_lg.to_csv("alex paper matches large modeldiv-conquer.csv")

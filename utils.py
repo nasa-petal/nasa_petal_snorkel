@@ -136,7 +136,7 @@ def smaller_models(L_match:np.ndarray,nLabelsPerGroup:int, nOverlap:int, labels_
     for i in range(len(translators)):
         translators[i] = {**{-1:-1}, **translators[i]}
     for i in range(len(translators_to_str)):
-        translators_to_str[i] = {**{-1:'no_match'},**translators_to_str[i]}
+        translators_to_str[i] = {**{-1:'no_match'},**translators_to_str[i]} # this is how you add to beginning of dictionary 
 
     # Normalize the data convert numbers that skip to incremental 
     for i in range(len(labels_overlap)):
@@ -148,11 +148,14 @@ def smaller_models(L_match:np.ndarray,nLabelsPerGroup:int, nOverlap:int, labels_
     
     # Create global comparison
     global_translator = dict(zip(unique_labels,range(len(unique_labels))))
-    global_translator[-1] = -1
+    label_indicies = list(range(len(labels)))
+    global_translator_str = dict(zip(label_indicies, itemgetter(*label_indicies)(labels_list)))
+    global_translator[-1] = {**{-1:-1},**global_translator}
+    global_translator_str = {**{-1:'no_match'},**global_translator_str}
     for key,value in global_translator.items():
         L_match = np.where(L_match == key, value, L_match)
         
-    return labels_overlap, L_matches, translators, translators_to_str, L_match, global_translator, dfs
+    return labels_overlap, L_matches, translators, translators_to_str, L_match, global_translator, global_translator_str, dfs
 
 
 def evaluate_model(L:np.ndarray,model:LabelModel,translator:Dict[int,str], model_index:int) -> Dict[str,float]:

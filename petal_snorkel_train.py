@@ -58,13 +58,13 @@ if not osp.exists('golden_lf.pickle'):
     applier = PandasLFApplier(lfs=labeling_function_list)
     L_golden = applier.apply(df=df)
 
-    labels_overlap, L_matches, translators, translators_to_str, L_match_all, global_translator, dfs = smaller_models(L_golden,5,2,labels_list=labels,df=df)
+    labels_overlap, L_matches, translators, translators_to_str, L_match_all, global_translator,global_translator_str, dfs = smaller_models(L_golden,5,2,labels_list=labels,df=df)
 
     with open('golden_lf.pickle','wb') as f:
         pickle.dump({'L_golden':L_golden,'labels_overlap':labels_overlap,'L_matches':L_matches, 
                     'translators':translators,'translators_to_str':translators_to_str, 
-                    'L_matches_all':L_match_all, 'global_translator':global_translator
-                    ,'dfs':dfs},f)
+                    'L_matches_all':L_match_all, 'global_translator':global_translator, 
+                    'global_translator_str':global_translator_str,'dfs':dfs},f)
 
 with open('golden_lf.pickle','rb') as f:
     data = pickle.load(f) 
