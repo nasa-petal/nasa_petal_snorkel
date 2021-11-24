@@ -1,12 +1,14 @@
 from pickle import TRUE
 import pandas as pd
 import numpy as np
+from snorkel.labeling.model import LabelModel
 from pandas.core.algorithms import unique
 from sklearn.model_selection import train_test_split
 from typing import Dict, List
 from itertools import combinations
 from copy import deepcopy
 from operator import itemgetter
+
 
 def load_dataset(load_train_labels: bool = False, split_dev_valid: bool = False):
     filename = r"labeled_data.csv"
@@ -15,7 +17,7 @@ def load_dataset(load_train_labels: bool = False, split_dev_valid: bool = False)
     df.columns = map(str.lower, df.columns)
     #comnine title and abstract columns into one and drop columns
     df['text'] = df['title'] + ' ' + df['abstract']
-    df = df.drop(['title', 'abstract'], axis=1)
+    # df = df.drop(['title', 'abstract'], axis=1)
     return df 
 
 
@@ -100,7 +102,7 @@ def smaller_models(L_match:np.ndarray,nLabelsPerGroup:int, nOverlap:int, labels_
                 break
     unused_unique_labels = [u for u in unique_labels if u not in unique_labels_used]
     labels_overlap.append(unused_unique_labels)
-    
+
     # Restructure L_match
     L_matches = list() # List of all the matches 
     dfs = list()
@@ -132,9 +134,9 @@ def smaller_models(L_match:np.ndarray,nLabelsPerGroup:int, nOverlap:int, labels_
     for i in range(len(labels)):
         labels[i].insert(0,-1)
     for i in range(len(translators)):
-        translators[i][-1] = -1
+        translators[i] = {**{-1:-1}, **translators[i]}
     for i in range(len(translators_to_str)):
-        translators_to_str[i][-1] = 'no_match'
+        translators_to_str[i] = {**{-1:'no_match'},**translators_to_str[i]}
 
     # Normalize the data convert numbers that skip to incremental 
     for i in range(len(labels_overlap)):
@@ -146,7 +148,39 @@ def smaller_models(L_match:np.ndarray,nLabelsPerGroup:int, nOverlap:int, labels_
     
     # Create global comparison
     global_translator = dict(zip(unique_labels,range(len(unique_labels))))
+    global_translator[-1] = -1
     for key,value in global_translator.items():
         L_match = np.where(L_match == key, value, L_match)
         
     return labels_overlap, L_matches, translators, translators_to_str, L_match, global_translator, dfs
+
+
+def evaluate_model(L:np.ndarray,model:LabelModel,translator:Dict[int,str], model_index:int) -> Dict[str,float]:
+    """[summary]
+
+    Args:
+        L (np.ndarray): [description]
+        model (LabelModel): [description]
+        translator (Dict[int,str]): [description]
+        model_index (int): index of model use as a reference 
+
+    Returns:
+        Dict[str,float]: [description]
+    """
+    n_papers,_ = L.shape
+    probs_train = model.predict_proba(L=L)
+    results = list()
+    keys = list(translator.keys())
+    # Loop through all papers and take top 3 
+    for i in range(n_papers):
+        j = 0
+        results.append(list())
+        for k,v in translator.items():
+            results[i].append(
+                    {
+                        'label':v,'probability': probs_train[i,j],'model_index':model_index
+                    }
+                )
+            j+=1
+    return results
+

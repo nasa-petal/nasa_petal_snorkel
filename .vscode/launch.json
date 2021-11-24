@@ -12,10 +12,10 @@
             "console": "integratedTerminal"
         },
         {
-            "name": "Predict",
+            "name": "Predict_alex",
             "type": "python",
             "request": "launch",
-            "program": "petal_snorkel_predict.py",
+            "program": "petal_snorkel_predict_alex.py",
             "console": "integratedTerminal"
         }
     ]
