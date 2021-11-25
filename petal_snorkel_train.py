@@ -8,6 +8,7 @@
 # <ARalevski, 10-17-2021, updated cardinality>
 # Authors: alexandra.ralevski@gmail.com, paht.juangphanich@nasa.gov
 # ------------------------------------------------- #
+from genericpath import exists
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -16,7 +17,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 import os.path as osp
 from tqdm import trange
 from create_labeling_functions import create_labeling_functions
-from utils import smaller_models
+from utils import smaller_models, single_model_to_dict, compare_single_model_dicts
 from ast import literal_eval
 from snorkel.labeling.model import MajorityLabelVoter
 from snorkel.labeling import PandasLFApplier
@@ -33,6 +34,9 @@ golden_json_url = 'https://raw.githubusercontent.com/nasa-petal/data-collection-
 filename = 'golden.json'
 large_model = 'large_model_trained.pickle'
 small_models = 'small_models_trained.pickle'
+'''
+    Download golden json 
+'''
 if not osp.exists(filename):
     wget.download(golden_json_url)
 
@@ -56,15 +60,17 @@ df_bio = pd.read_csv(r'./biomimicry_functions_enumerated.csv')
 labels = dict(
     zip(df_bio['function_enumerated'].tolist(), df_bio['function'].tolist()))
 
-labeling_function_list = create_labeling_functions(
-    r'./biomimicry_functions_enumerated.csv', r'./biomimicry_function_rules.csv')
-applier = PandasLFApplier(lfs=labeling_function_list)
-L_golden = applier.apply(df=df)
 
-labels_overlap, L_matches, translators, translators_to_str, L_match_all, global_translator, global_translator_str, dfs = smaller_models(
-    L_golden, 5, 2, labels_list=labels, df=df)
-# loop through all Golden JSON and Predict
+
+'''
+    Loop through all Golden JSON and create L-matrix
+'''
 if not osp.exists('golden_lf.pickle'):
+    labeling_function_list = create_labeling_functions(r'./biomimicry_functions_enumerated.csv', r'./biomimicry_function_rules.csv')
+    applier = PandasLFApplier(lfs=labeling_function_list)
+    L_golden = applier.apply(df=df)
+    labels_overlap, L_matches, translators, translators_to_str, L_match_all, global_translator, global_translator_str, dfs = smaller_models(
+    L_golden, 5, 2, labels_list=labels, df=df)
     with open('golden_lf.pickle', 'wb') as f:
         pickle.dump({'L_golden': L_golden, 'labels_overlap': labels_overlap, 'L_matches': L_matches,
                     'translators': translators, 'translators_to_str': translators_to_str,
@@ -83,8 +89,9 @@ with open('golden_lf.pickle', 'rb') as f:
     dfs = data['dfs']
     global_translator = data['global_translator']
     L_match_all = data['L_matches_all']
+
 '''
-    Loop to evaluate all the smaller models
+    Train small models
     Note: some models are very small to splitting them into test and train can be tricky 
 '''
 if not osp.exists(small_models):
@@ -117,13 +124,22 @@ if not osp.exists(small_models):
                      'translators': translators, 'translators_to_str': translators_to_str,
                      'texts_df': dfs}, f)
 
-# Training a single large model
-cardinality = len(global_translator)
-majority_model = MajorityLabelVoter(cardinality=cardinality)
-preds_train = majority_model.predict(L=L_match_all)
-label_model = LabelModel(cardinality=cardinality, verbose=True, device='cpu')
-label_model.fit(L_train=L_match_all, n_epochs=300, log_freq=50, seed=123)
+'''
+    Train large models
+    Note: some models are very small to splitting them into test and train can be tricky 
+'''
+if not osp.exists(large_model):
+    # Training a single large model
+    cardinality = len(global_translator)
+    majority_model = MajorityLabelVoter(cardinality=cardinality)
+    preds_train = majority_model.predict(L=L_match_all)
+    label_model = LabelModel(cardinality=cardinality, verbose=True, device='cpu')
+    label_model.fit(L_train=L_match_all, n_epochs=300, log_freq=50, seed=123)
 
-with open(large_model, 'wb') as f:
-    pickle.dump({"Label_model": label_model, 'global_translator': global_translator,
-                'global_translator_str': global_translator_str, 'text_df': df}, f)
+    with open(large_model, 'wb') as f:
+        pickle.dump({"Label_model": label_model, 'global_translator': global_translator,
+                    'global_translator_str': global_translator_str, 'text_df': df}, f)
+
+'''
+    Predict Large Model 
+'''
