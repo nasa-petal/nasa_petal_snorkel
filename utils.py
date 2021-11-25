@@ -20,25 +20,11 @@ def load_dataset(load_train_labels: bool = False, split_dev_valid: bool = False)
     # df = df.drop(['title', 'abstract'], axis=1)
     return df 
 
-
-    # df_train = df.sample(frac=0.6, random_state=123).reset_index(drop=True)
-    # df_dev = df_train.sample(frac=0.2, random_state=123)
-
-    # if not load_train_labels:
-    #     df_train['label'] = np.ones(len(df_train['label'])) * -1
-    
-    # df_valid_test = df_train.sample(frac=0.5, random_state=123)
-    # df_valid, df_test = train_test_split(df_valid_test, random_state=123, stratify=df_valid_test.label)
-
-    # if split_dev_valid:
-    #     return df_train, df_dev, df_valid, df_test
-    # else:
-    #     return df_train, df_test
-    
-    """
-        Returns
-            (List)
-    """
+def normalize_L(L:np.ndarray,translator):
+    # Normalize the data convert numbers that skip to incremental 
+    for key,value in translator.items():
+        L = np.where(L == key, value, L)
+    return L
 
 
 
@@ -148,9 +134,8 @@ def smaller_models(L_match:np.ndarray,nLabelsPerGroup:int, nOverlap:int, labels_
     
     # Create global comparison
     global_translator = dict(zip(unique_labels,range(len(unique_labels))))
-    label_indicies = list(range(len(labels)))
-    global_translator_str = dict(zip(label_indicies, itemgetter(*label_indicies)(labels_list)))
-    global_translator[-1] = {**{-1:-1},**global_translator}
+    global_translator_str = dict(zip(range(len(unique_labels)), itemgetter(*unique_labels)(labels_list)))
+    global_translator = {**{-1:-1},**global_translator}
     global_translator_str = {**{-1:'no_match'},**global_translator_str}
     for key,value in global_translator.items():
         L_match = np.where(L_match == key, value, L_match)
@@ -158,8 +143,8 @@ def smaller_models(L_match:np.ndarray,nLabelsPerGroup:int, nOverlap:int, labels_
     return labels_overlap, L_matches, translators, translators_to_str, L_match, global_translator, global_translator_str, dfs
 
 
-def evaluate_model(L:np.ndarray,model:LabelModel,translator:Dict[int,str], model_index:int) -> Dict[str,float]:
-    """[summary]
+def evaluate_model(L:np.ndarray,model:LabelModel,translator:Dict[int,str], model_index:int) -> List[Dict]:
+    """Takes a L matrix and model evaluates that then the results are translated into a list containing the label for eahc paper, probability, and model index 
 
     Args:
         L (np.ndarray): [description]
@@ -168,12 +153,11 @@ def evaluate_model(L:np.ndarray,model:LabelModel,translator:Dict[int,str], model
         model_index (int): index of model use as a reference 
 
     Returns:
-        Dict[str,float]: [description]
+        List[Dict]: {'label', 'probability', 'model_index'} for all papers 
     """
     n_papers,_ = L.shape
     probs_train = model.predict_proba(L=L)
     results = list()
-    keys = list(translator.keys())
     # Loop through all papers and take top 3 
     for i in range(n_papers):
         j = 0

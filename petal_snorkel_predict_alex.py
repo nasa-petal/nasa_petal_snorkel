@@ -19,7 +19,7 @@ import pandas as pd
 from tqdm import trange
 import numpy as np 
 from ast import literal_eval
-from utils import load_dataset, evaluate_model
+from utils import load_dataset, evaluate_model,normalize_L
 from create_labeling_functions import create_labeling_functions
 import ast
 '''
@@ -30,9 +30,11 @@ labeling_function_list = create_labeling_functions(r'./biomimicry_functions_enum
 df_bio = pd.read_csv(r'./biomimicry_functions_enumerated.csv')
 labels = dict(zip(df_bio['function_enumerated'].tolist(),df_bio['function'].tolist()))
 
+# TODO: Need to make sure L_matches is normalized using global_json predictions 
+
 applier = PandasLFApplier(lfs=labeling_function_list)
 L_match = applier.apply(df=df)
-labels_overlap, L_matches, translators, translators_to_str, L_match_all, global_translator, dfs = smaller_models(L_match,5,2,labels_list=labels,df=df)
+
 
 large_model = 'large_model_trained.pickle'
 small_models = 'small_models_trained.pickle'
@@ -40,31 +42,47 @@ small_models = 'small_models_trained.pickle'
 if osp.exists(small_models):
     with open(small_models,'rb') as f:
         smaller_model_data = pickle.load(f)
-        all_labels = dict()
+        smaller_model_L = list()
         for i in trange(len(smaller_model_data)):
-            translator = smaller_model_data['translators_to_str'][i]
-            for k,v in translator.items():
-                if v not in all_labels.keys():
-                    all_labels[v] = list() 
+            labels = smaller_model_data['labels_overlap'][i]
+            translator = smaller_model_data['translators'][i]
+            translator_to_str = smaller_model_data['translators_to_str'][i]
+            smaller_model_L.append(normalize_L(L=L_match,translator=translator))
+            
 
 if osp.exists(large_model):
     with open(large_model,'rb') as f:
         large_model_data = pickle.load(f)
+        large_label_model = large_model_data['Label_model']
+        global_translator = large_model_data['global_translator'] # old labels to new 
+        global_translator_str = large_model_data['global_translator_str']
 
-def evaluate_models(label_models:List, translators_to_str:List):
-    """Evaluates small models using Alex dataset 
+        large_model_L = normalize_L(L=L_match,translator=global_translator)
+
+def evaluate_single_model(label_model:LabelModel, translator_to_str:Dict[int,str],L_match:np.ndarray) -> List[Dict]:
+    """Evaluates the prediction accuracy of a single model
 
     Args:
-        label_models (List): List of label models from snorkel 
-        translators_to_str (List): list of dictionaries translating matches to strings 
+        label_model (LabelModel): Model
+        translator_to_str (Dict[int,str]): dictionary containing keys -> string conversion
+        L_match (np.ndarray): this is the numpy array from pandas lf filter
 
     Returns:
-        [type]: [description]
+        List[Dict]: List of results
     """
-    # Create a copy of the all labels dictionary for each paper
+    model = label_model
+    translator = translator_to_str
     results_for_each_paper = list()
-    for p in trange(L_match.shape[0]):
-        L = L_match[p,:].reshape(1,-1)
+    temp = evaluate_model(L_match, model, translator,i)
+    for p, paper in enumerate(temp):
+        probabilities = [t['probability'] for t in paper]
+        labels = [t['label'] for t in paper]
+        model_indicies = [t['model_index'] for t in paper]
+                
+        zipped = list(zip(probabilities,labels,model_indicies))
+        zipped = sorted(zipped, reverse=True)
+        probabilities, labels, model_indicies = zip(*zipped)
+    
         results_for_each_paper.append({ 
                 'title':df.iloc[p]['title'], 'abstract':df.iloc[p]['abstract'],
                 'doi':df.iloc[p]['doi']})
@@ -72,34 +90,6 @@ def evaluate_models(label_models:List, translators_to_str:List):
             results_for_each_paper[p]['label'] = ast.literal_eval(df.iloc[p]['label_level_1'])
         else:
             results_for_each_paper[p]['label'] = 'not found'
-
-        results_for_each_paper[p]['label-snorkel-1'] = ''
-        results_for_each_paper[p]['label-snorkel-2'] = ''
-        results_for_each_paper[p]['label-snorkel-3'] = ''
-        results_for_each_paper[p]['probability-snorkel-1'] = 0
-        results_for_each_paper[p]['probability-snorkel-2'] = 0
-        results_for_each_paper[p]['probability-snorkel-3'] = 0
-        results_for_each_paper[p]['model-index-snorkel-1'] = 0
-        results_for_each_paper[p]['model-index-snorkel-2'] = 0
-        results_for_each_paper[p]['model-index-snorkel-3'] = 0
-        labels = list()
-        probabilities = list() 
-        model_indicies = list() 
-        for i in range(len(label_models)):
-            model = label_models[i]
-            translator = translators_to_str[i]
-            temp = evaluate_model(L, model,translator,i)
-            temp = temp[0]
-            temp_probabilities = [t['probability'] for t in temp]
-            temp_labels = [t['label'] for t in temp]
-            temp_model_indicies = [t['model_index'] for t in temp]
-            labels.extend(temp_labels)
-            probabilities.extend(temp_probabilities)
-            model_indicies.extend(temp_model_indicies)
-        
-        zipped = list(zip(probabilities,labels,model_indicies))
-        zipped = sorted(zipped, reverse=True)
-        probabilities, labels, model_indicies = zip(*zipped)
 
         results_for_each_paper[p]['label-snorkel-1'] = labels[0]
         results_for_each_paper[p]['label-snorkel-2'] = labels[1]
@@ -110,19 +100,41 @@ def evaluate_models(label_models:List, translators_to_str:List):
         results_for_each_paper[p]['model-index-snorkel-1'] = model_indicies[0]
         results_for_each_paper[p]['model-index-snorkel-2'] = model_indicies[1]
         results_for_each_paper[p]['model-index-snorkel-3'] = model_indicies[2]
+    # Create a copy of the all labels dictionary for each paper
+    # results_for_each_paper = list()
+    # for p in trange(L_match.shape[0]): 
+    #     L = L_match[p,:].reshape(1,-1)
+    #     results_for_each_paper.append({ 
+    #             'title':df.iloc[p]['title'], 'abstract':df.iloc[p]['abstract'],
+    #             'doi':df.iloc[p]['doi']})
+    #     if not pd.isna(df.iloc[p]['label_level_1']):
+    #         results_for_each_paper[p]['label'] = ast.literal_eval(df.iloc[p]['label_level_1'])
+    #     else:
+    #         results_for_each_paper[p]['label'] = 'not found'
+
+    #     results_for_each_paper[p]['label-snorkel-1'] = ''
+    #     results_for_each_paper[p]['label-snorkel-2'] = ''
+    #     results_for_each_paper[p]['label-snorkel-3'] = ''
+    #     results_for_each_paper[p]['probability-snorkel-1'] = 0
+    #     results_for_each_paper[p]['probability-snorkel-2'] = 0
+    #     results_for_each_paper[p]['probability-snorkel-3'] = 0
+    #     results_for_each_paper[p]['model-index-snorkel-1'] = 0
+    #     results_for_each_paper[p]['model-index-snorkel-2'] = 0
+    #     results_for_each_paper[p]['model-index-snorkel-3'] = 0
+
+        
     return results_for_each_paper
 
 '''
     Evaluation using smaller models
 '''
-# small_model_results = evaluate_models(smaller_model_data['Label_models'], smaller_model_data['translators_to_str'])
+# small_model_results = evaluate_single_model(, smaller_model_data['translators_to_str'],smaller_model_labels)
 # df_sm = pd.DataFrame(small_model_results)
 # df_sm.to_csv("alex paper matches div-conquer.csv")
 
 '''
     Evaluate using larger model
 '''
-labels = {-1:"no_match", **labels}
-large_model_results = evaluate_models([large_model_data['Label_model']], [labels])
+large_model_results = evaluate_single_model(large_label_model, global_translator_str,large_model_L)
 df_lg = pd.DataFrame(large_model_results)
-df_lg.to_csv("alex paper matches large modeldiv-conquer.csv")
+df_lg.to_csv("alex paper matches large model.csv")

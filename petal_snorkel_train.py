@@ -49,17 +49,16 @@ for paper in golden_json:
     datalist.append(data)
 df = pd.DataFrame(datalist)
 
+df_bio = pd.read_csv(r'./biomimicry_functions_enumerated.csv')
+labels = dict(zip(df_bio['function_enumerated'].tolist(),df_bio['function'].tolist()))
+
+labeling_function_list = create_labeling_functions(r'./biomimicry_functions_enumerated.csv', r'./biomimicry_function_rules.csv')
+applier = PandasLFApplier(lfs=labeling_function_list)
+L_golden = applier.apply(df=df)
+
+labels_overlap, L_matches, translators, translators_to_str, L_match_all, global_translator,global_translator_str, dfs = smaller_models(L_golden,5,2,labels_list=labels,df=df)
 # loop through all Golden JSON and Predict 
 if not osp.exists('golden_lf.pickle'):
-    df_bio = pd.read_csv(r'./biomimicry_functions_enumerated.csv')
-    labels = dict(zip(df_bio['function_enumerated'].tolist(),df_bio['function'].tolist()))
-
-    labeling_function_list = create_labeling_functions(r'./biomimicry_functions_enumerated.csv', r'./biomimicry_function_rules.csv')
-    applier = PandasLFApplier(lfs=labeling_function_list)
-    L_golden = applier.apply(df=df)
-
-    labels_overlap, L_matches, translators, translators_to_str, L_match_all, global_translator,global_translator_str, dfs = smaller_models(L_golden,5,2,labels_list=labels,df=df)
-
     with open('golden_lf.pickle','wb') as f:
         pickle.dump({'L_golden':L_golden,'labels_overlap':labels_overlap,'L_matches':L_matches, 
                     'translators':translators,'translators_to_str':translators_to_str, 
@@ -82,29 +81,30 @@ with open('golden_lf.pickle','rb') as f:
     Loop to evaluate all the smaller models
     Note: some models are very small to splitting them into test and train can be tricky 
 '''
-models = list()
-for i in trange(len(L_matches),desc="training small models"):
-    L_match = L_matches[i]
-    # TODO split the dataset so theres an equal amount of all labels
-    L_train = L_match
-    L_test = L_match 
+if not osp.exists(small_models):
+    models = list()
+    for i in trange(len(L_matches),desc="training small models"):
+        L_match = L_matches[i]
+        # TODO split the dataset so theres an equal amount of all labels
+        L_train = L_match
+        L_test = L_match 
 
-    labels = labels_overlap[i]
-    cardinality = len(labels)   # How many labels to predict 
-    majority_model = MajorityLabelVoter(cardinality=cardinality)
-    preds_train = majority_model.predict(L=L_train)                 # Looks at each text and sees which label is predicted the most 
-    
-    # Train LabelModel - this outputs probabilistic floats 
-    label_model = LabelModel(cardinality=cardinality, verbose=True, device = 'cpu')
-    label_model.fit(L_train=L_train, n_epochs=350, log_freq=50, seed=123)
-    probs_train = label_model.predict_proba(L=L_train)  # This gives you the probability of which label paper falls under 
+        labels = labels_overlap[i]
+        cardinality = len(labels)   # How many labels to predict 
+        majority_model = MajorityLabelVoter(cardinality=cardinality)
+        preds_train = majority_model.predict(L=L_train)                 # Looks at each text and sees which label is predicted the most 
+        
+        # Train LabelModel - this outputs probabilistic floats 
+        label_model = LabelModel(cardinality=cardinality, verbose=True, device = 'cpu')
+        label_model.fit(L_train=L_train, n_epochs=350, log_freq=50, seed=123)
+        probs_train = label_model.predict_proba(L=L_train)  # This gives you the probability of which label paper falls under 
 
-    models.append(label_model) # this label model can help predict the type of paper
+        models.append(label_model) # this label model can help predict the type of paper
 
-with open(small_models,'wb') as f:
-    pickle.dump({"Label_models":models, 'labels_overlap':labels_overlap,
-        'translators':translators,'translators_to_str':translators_to_str,
-        'texts_df':dfs},f)
+    with open(small_models,'wb') as f:
+        pickle.dump({"Label_models":models, 'labels_overlap':labels_overlap,
+            'translators':translators,'translators_to_str':translators_to_str,
+            'texts_df':dfs},f)
 
 # Training a single large model
 cardinality = len(global_translator)
@@ -115,4 +115,4 @@ label_model.fit(L_train=L_match_all, n_epochs=300, log_freq=50, seed=123)
 
 with open(large_model,'wb') as f:
     pickle.dump({"Label_model":label_model,'global_translator':global_translator,
-        'text_df':df},f)
+                'global_translator_str':global_translator_str,'text_df':df},f)
