@@ -8,7 +8,7 @@ from typing import Dict, List
 from itertools import combinations
 from copy import deepcopy
 from operator import itemgetter
-
+import ast
 
 def load_dataset(load_train_labels: bool = False, split_dev_valid: bool = False):
     filename = r"labeled_data.csv"
@@ -156,7 +156,7 @@ def evaluate_model(L:np.ndarray,model:LabelModel,translator:Dict[int,str], model
         List[Dict]: {'label', 'probability', 'model_index'} for all papers 
     """
     n_papers,_ = L.shape
-    probs_train = model.predict_proba(L=L)
+    probs_train = model.predict_proba(L)
     results = list()
     # Loop through all papers and take top 3 
     for i in range(n_papers):
@@ -172,7 +172,7 @@ def evaluate_model(L:np.ndarray,model:LabelModel,translator:Dict[int,str], model
     return results
 
 
-def single_model_to_dict(label_model:LabelModel, translator_to_str:Dict[int,str],L_match:np.ndarray,model_index:int) -> List[Dict]:
+def single_model_to_dict(L:np.ndarray, label_model:LabelModel, translator_to_str:Dict[int,str],model_index:int,df:pd.DataFrame) -> List[Dict]:
     """Evaluates the prediction accuracy of a single model
 
     Args:
@@ -187,7 +187,7 @@ def single_model_to_dict(label_model:LabelModel, translator_to_str:Dict[int,str]
     model = label_model
     translator = translator_to_str
     results_for_each_paper = list()
-    temp = evaluate_model(L_match, model, translator,model_index)
+    temp = evaluate_model(L, model, translator,model_index)
     for p, paper in enumerate(temp):
         probabilities = [t['probability'] for t in paper]
         labels = [t['label'] for t in paper]

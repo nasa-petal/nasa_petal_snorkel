@@ -67,7 +67,7 @@ if osp.exists(large_model):
 '''
 best_results = None
 for i in range(len(smaller_model_data['Label_models'])):
-    results = single_model_to_dict(smaller_model_data['Label_models'][i], smaller_model_data['translators_to_str'][i],smaller_model_L[i],i)
+    results = single_model_to_dict(L_match, smaller_model_data['Label_models'][i], smaller_model_data['translators_to_str'][i],i,df)
     if i ==0:
         best_results = deepcopy(results)
     else:
@@ -77,6 +77,6 @@ df_sm.to_csv("alex paper matches small models.csv")
 '''
     Evaluate using larger model
 '''
-large_model_results = single_model_to_dict(large_label_model, global_translator_str,large_model_L,0)
+large_model_results = single_model_to_dict(L_match,large_label_model, global_translator_str,large_model_L,0,df)
 df_lg = pd.DataFrame(large_model_results)
 df_lg.to_csv("alex paper matches large model.csv")

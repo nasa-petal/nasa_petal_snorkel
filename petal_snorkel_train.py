@@ -16,17 +16,19 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.feature_extraction.text import CountVectorizer
 import os.path as osp
 from tqdm import trange
+import sys
+sys.path.insert(0, '../snorkel')
 from create_labeling_functions import create_labeling_functions
-from utils import smaller_models, single_model_to_dict, compare_single_model_dicts
+from utils import smaller_models, single_model_to_dict, compare_single_model_dicts, normalize_L
+from copy import deepcopy
 from ast import literal_eval
 from snorkel.labeling.model import MajorityLabelVoter
 from snorkel.labeling import PandasLFApplier
 from snorkel.labeling.model import LabelModel
-import sys
 import wget
 import pickle
 import json
-sys.path.insert(0, '../snorkel')
+
 # import csv file and load train/test/split of dataset
 
 golden_json_url = 'https://raw.githubusercontent.com/nasa-petal/data-collection-and-prep/main/golden.json'
@@ -110,8 +112,8 @@ if not osp.exists(small_models):
 
         # Train LabelModel - this outputs probabilistic floats
         label_model = LabelModel(
-            cardinality=cardinality, verbose=True, device='cpu')
-        label_model.fit(L_train=L_train, n_epochs=350, log_freq=50, seed=123)
+            cardinality=cardinality, verbose=True, device='cuda')
+        label_model.fit(L_train=L_train, n_epochs=350, log_freq=100, seed=123)
         # This gives you the probability of which label paper falls under
         probs_train = label_model.predict_proba(L=L_train)
 
@@ -119,7 +121,6 @@ if not osp.exists(small_models):
         models.append(label_model)
 
     with open(small_models, 'wb') as f:
-        f
         pickle.dump({"Label_models": models, 'labels_overlap': labels_overlap,
                      'translators': translators, 'translators_to_str': translators_to_str,
                      'texts_df': dfs}, f)
@@ -141,5 +142,41 @@ if not osp.exists(large_model):
                     'global_translator_str': global_translator_str, 'text_df': df}, f)
 
 '''
-    Predict Large Model 
+    Evaluation using smaller models
 '''
+if osp.exists(small_models):
+    with open(small_models,'rb') as f:
+        smaller_model_data = pickle.load(f)
+        smaller_model_L = list()
+        for i in trange(len(smaller_model_data['labels_overlap'])):            
+            labels = smaller_model_data['labels_overlap'][i]
+            translator = smaller_model_data['translators'][i]
+            translator_to_str = smaller_model_data['translators_to_str'][i]
+            smaller_model_L.append(normalize_L(L=L_golden,translator=translator))
+
+best_results = None
+for i in range(len(smaller_model_data['Label_models'])):
+    results = single_model_to_dict(L_matches[i],smaller_model_data['Label_models'][i], smaller_model_data['translators_to_str'][i],smaller_model_L[i],i,dfs[i])
+    if i ==0:
+        best_results = deepcopy(results)
+    else:
+        best_results = compare_single_model_dicts(best_results,results)
+df_sm = pd.DataFrame(best_results)
+df_sm.to_csv("golden json matches small models.csv")
+
+
+'''
+    Evaluate using larger model
+'''
+if osp.exists(large_model):
+    with open(large_model,'rb') as f:
+        large_model_data = pickle.load(f)
+        large_label_model = large_model_data['Label_model']
+        global_translator = large_model_data['global_translator'] # old labels to new 
+        global_translator_str = large_model_data['global_translator_str']
+
+        large_model_L = normalize_L(L=L_golden,translator=global_translator)
+
+large_model_results = single_model_to_dict(L_golden,large_label_model, global_translator_str,large_model_L,0,df)
+df_lg = pd.DataFrame(large_model_results)
+df_lg.to_csv("golden json matches large model.csv")
