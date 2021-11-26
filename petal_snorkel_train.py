@@ -55,6 +55,8 @@ for paper in golden_json:
         paper['title']) + literal_eval(paper['abstract']))
     data['doi'] = paper['doi']
     data['paperid'] = paper['paper']
+    data['title'] = ' '.join(literal_eval(paper['title']))
+    data['abstract'] = ' '.join(literal_eval(paper['abstract']))
     datalist.append(data)
 df = pd.DataFrame(datalist)
 
@@ -88,6 +90,7 @@ with open('golden_lf.pickle', 'rb') as f:
     labels_overlap = data['labels_overlap']
     translators = data['translators']
     translators_to_str = data['translators_to_str']
+    global_translator_str = data['global_translator_str']
     dfs = data['dfs']
     global_translator = data['global_translator']
     L_match_all = data['L_matches_all']
@@ -156,7 +159,7 @@ if osp.exists(small_models):
 
 best_results = None
 for i in range(len(smaller_model_data['Label_models'])):
-    results = single_model_to_dict(L_matches[i],smaller_model_data['Label_models'][i], smaller_model_data['translators_to_str'][i],smaller_model_L[i],i,dfs[i])
+    results = single_model_to_dict(L_matches[i],smaller_model_data['Label_models'][i], smaller_model_data['translators_to_str'][i],i,dfs[i])
     if i ==0:
         best_results = deepcopy(results)
     else:
@@ -177,6 +180,6 @@ if osp.exists(large_model):
 
         large_model_L = normalize_L(L=L_golden,translator=global_translator)
 
-large_model_results = single_model_to_dict(L_golden,large_label_model, global_translator_str,large_model_L,0,df)
+large_model_results = single_model_to_dict(L_golden,large_label_model, global_translator_str,0,df)
 df_lg = pd.DataFrame(large_model_results)
 df_lg.to_csv("golden json matches large model.csv")
