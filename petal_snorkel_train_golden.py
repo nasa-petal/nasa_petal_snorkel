@@ -116,7 +116,7 @@ if not osp.exists(small_models):
 
         # Train LabelModel - this outputs probabilistic floats
         label_model = LabelModel(
-            cardinality=cardinality, verbose=True, device='cuda')
+            cardinality=cardinality, verbose=True, device='cpu')
         label_model.fit(L_train=L_train, n_epochs=350, log_freq=100, seed=123)
         # This gives you the probability of which label paper falls under
         probs_train = label_model.predict_proba(L=L_train)
