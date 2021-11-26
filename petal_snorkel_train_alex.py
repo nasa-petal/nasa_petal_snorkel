@@ -46,7 +46,8 @@ with open(filename, 'r') as f:
     golden_json = json.load(f)
 
 '''
-    Train snorkel using Golden.json 
+    Train snorkel using Golden.json
+    Loads golden_json to a dataframe.
 '''
 datalist = list()
 for paper in golden_json:
@@ -68,7 +69,7 @@ labels = dict(
 
 
 '''
-    Loop through all Golden JSON and create L-matrix
+    Loop through all Golden JSON and create L-matrix and smaller models.
 '''
 if not osp.exists('golden_lf.pickle'):
     labeling_function_list = create_labeling_functions(r'./biomimicry_functions_enumerated.csv', r'./biomimicry_function_rules.csv')
@@ -99,6 +100,7 @@ with open('golden_lf.pickle', 'rb') as f:
 '''
     Train small models
     Note: some models are very small to splitting them into test and train can be tricky 
+        Each small model is trained on it's own set of papers. 
 '''
 if not osp.exists(small_models):
     models = list()
@@ -116,7 +118,7 @@ if not osp.exists(small_models):
 
         # Train LabelModel - this outputs probabilistic floats
         label_model = LabelModel(
-            cardinality=cardinality, verbose=True, device='cuda')
+            cardinality=cardinality, verbose=True, device='cuda') # smaller models can be trained with GPU 
         label_model.fit(L_train=L_train, n_epochs=350, log_freq=100, seed=123)
         # This gives you the probability of which label paper falls under
         probs_train = label_model.predict_proba(L=L_train)
@@ -141,9 +143,10 @@ if not osp.exists(large_model):
     label_model = LabelModel(cardinality=cardinality, verbose=True, device='cpu')
     label_model.fit(L_train=L_match_all, n_epochs=300, log_freq=50, seed=123)
 
-    with open(large_model, 'wb') as f:
+    with open(large_model, 'wb') as f:  # Saves the large model 
         pickle.dump({"Label_model": label_model, 'global_translator': global_translator,
                     'global_translator_str': global_translator_str, 'text_df': df}, f)
+
 
 '''
     Evaluation using smaller models
@@ -161,8 +164,9 @@ if osp.exists(small_models):
 results = list()
 for i in range(len(smaller_model_data['Label_models'])):
     results.extend(single_model_to_dict(L_matches[i],smaller_model_data['Label_models'][i], smaller_model_data['translators_to_str'][i],i,dfs[i]))
-# Filter papers by unique doi 
 
+
+# Filter papers by unique doi 
 df_sm = pd.DataFrame(results)
 doi_all = df_sm['doi'].unique()
 results = list()
@@ -187,9 +191,8 @@ if osp.exists(large_model):
         large_label_model = large_model_data['Label_model']
         global_translator = large_model_data['global_translator'] # old labels to new 
         global_translator_str = large_model_data['global_translator_str']
-
         large_model_L = normalize_L(L=L_golden,translator=global_translator)
 
-large_model_results = single_model_to_dict(L_golden,large_label_model, global_translator_str,0,df)
+large_model_results = single_model_to_dict(large_model_L,large_label_model, global_translator_str,0,df)
 df_lg = pd.DataFrame(large_model_results)
 df_lg.to_csv("golden json matches large model.csv")

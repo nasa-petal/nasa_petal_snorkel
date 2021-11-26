@@ -190,6 +190,6 @@ if osp.exists(large_model):
 
         large_model_L = normalize_L(L=L_golden,translator=global_translator)
 
-large_model_results = single_model_to_dict(L_golden,large_label_model, global_translator_str,0,df)
+large_model_results = single_model_to_dict(large_model_L,large_label_model, global_translator_str,0,df)
 df_lg = pd.DataFrame(large_model_results)
 df_lg.to_csv("golden json matches large model.csv")
