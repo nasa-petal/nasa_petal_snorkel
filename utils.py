@@ -216,25 +216,42 @@ def single_model_to_dict(L:np.ndarray, label_model:LabelModel, translator_to_str
         results_for_each_paper[p]['model-index-snorkel-3'] = model_indicies[2]
     return results_for_each_paper
 
-def compare_single_model_dicts(result1:List[Dict], result2:List[Dict]) -> List[Dict]: 
-    """Compares one result with another and outputs the best case
+def compare_single_model_dict(result1:Dict, result2:Dict) -> List[Dict]: 
+    """Compares one result with another and outputs the best case. This function compares a single dictionary with another 
 
     Args:
-        result1 (List[Dict]): [description]
-        result2 (List[Dict]): [description]
+        result1 (Dict): Original
+        result2 (Dict): new 
 
     Returns:
-        List[Dict]: [description]
+        Dict: Either original or modified 
+    """
+    if result2['probability-snorkel-1'] > result1['probability-snorkel-1']: 
+        result1['label-snorkel-1']  = result2['label-snorkel-1']
+        result1['label-snorkel-1']  = result2['label-snorkel-1']
+        result1['probability-snorkel-1']  = result2['probability-snorkel-1']
+
+    if result2['probability-snorkel-2'] > result1['probability-snorkel-2']: 
+        result1['label-snorkel-2']  = result2['label-snorkel-2']
+        result1['label-snorkel-2']  = result2['label-snorkel-2']
+        result1['probability-snorkel-2']  = result2['probability-snorkel-2']
+
+    if result2['probability-snorkel-3'] > result1['probability-snorkel-3']: 
+        result1['label-snorkel-3']  = result2['label-snorkel-3']
+        result1['label-snorkel-3']  = result2['label-snorkel-3']
+        result1['probability-snorkel-3']  = result2['probability-snorkel-3']
+    return result1
+
+def compare_single_model_dicts(result1:List[Dict], result2:List[Dict]) -> List[Dict]: 
+    """Compares one result with another and outputs the best case. This function takes a list of two results of equal length
+
+    Args:
+        result1 (List[Dict]): Original
+        result2 (List[Dict]): New 
+
+    Returns:
+        List[Dict]: Either original or modified 
     """
     for i in range(len(result1)):
-
-        if result2[i]['probability-snorkel-1'] > result1[i]['probability-snorkel-1']: 
-            result1[i]['label-snorkel-1']  = result2[i]['label-snorkel-1']
-            result1[i]['label-snorkel-1']  = result2[i]['label-snorkel-1']
-        if result2[i]['probability-snorkel-2'] > result1[i]['probability-snorkel-2']: 
-            result1[i]['label-snorkel-2']  = result2[i]['label-snorkel-2']
-            result1[i]['label-snorkel-2']  = result2[i]['label-snorkel-2']
-        if result2[i]['probability-snorkel-3'] > result1[i]['probability-snorkel-3']: 
-            result1[i]['label-snorkel-3']  = result2[i]['label-snorkel-3']
-            result1[i]['label-snorkel-3']  = result2[i]['label-snorkel-3']
+        result1[i] = compare_single_model_dict(result1[i],result2[i])
     return result1
