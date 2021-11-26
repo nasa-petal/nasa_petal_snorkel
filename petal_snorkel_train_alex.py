@@ -88,13 +88,9 @@ label_model.fit(L_train=L_match_all, n_epochs=300, log_freq=50, seed=123)
 '''
     Evaluation using smaller models
 '''
-smaller_model_L = list()
-for i in trange(len(labels_overlap)):            
-    smaller_model_L.append(normalize_L(L=L_match[i],translator=translator[i]))
-
 results = list()
-for i in range(len(smaller_model_data['Label_models'])):
-    results.extend(single_model_to_dict(L_matches[i],smaller_model_data['Label_models'][i], smaller_model_data['translators_to_str'][i],i,dfs[i]))
+for i in range(len(models)):
+    results.extend(single_model_to_dict(L_matches[i],models[i], translators_to_str[i],i,dfs[i]))
 # Filter papers by unique doi 
 
 df_sm = pd.DataFrame(results)
@@ -109,21 +105,11 @@ for doi in doi_all:
         else:
             results[-1] = compare_single_model_dict(results[-1],papers[p])
 df_sm = pd.DataFrame(results)
-df_sm.to_csv("golden json matches small models.csv")
-
+df_sm.to_csv("alex csv matches small models trained from alex csv.csv")
 
 '''
     Evaluate using larger model
 '''
-if osp.exists(large_model):
-    with open(large_model,'rb') as f:
-        large_model_data = pickle.load(f)
-        large_label_model = large_model_data['Label_model']
-        global_translator = large_model_data['global_translator'] # old labels to new 
-        global_translator_str = large_model_data['global_translator_str']
-
-        large_model_L = normalize_L(L=L_golden,translator=global_translator)
-
-large_model_results = single_model_to_dict(large_model_L,large_label_model, global_translator_str,0,df)
+large_model_results = single_model_to_dict(L_match_all,label_model, global_translator_str,0,df)
 df_lg = pd.DataFrame(large_model_results)
-df_lg.to_csv("golden json matches large model.csv")
+df_lg.to_csv("alex csv matches large model trained from alex csv.csv")

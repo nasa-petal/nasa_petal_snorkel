@@ -151,12 +151,6 @@ if not osp.exists(large_model):
 if osp.exists(small_models):
     with open(small_models,'rb') as f:
         smaller_model_data = pickle.load(f)
-        smaller_model_L = list()
-        for i in trange(len(smaller_model_data['labels_overlap'])):            
-            labels = smaller_model_data['labels_overlap'][i]
-            translator = smaller_model_data['translators'][i]
-            translator_to_str = smaller_model_data['translators_to_str'][i]
-            smaller_model_L.append(normalize_L(L=L_golden,translator=translator))
 
 results = list()
 for i in range(len(smaller_model_data['Label_models'])):
