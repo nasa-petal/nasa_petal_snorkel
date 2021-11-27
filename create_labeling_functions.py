@@ -1,4 +1,6 @@
 import pandas as pd 
+import sys
+sys.path.insert(0, '../snorkel')
 from snorkel.labeling import LabelingFunction
 import itertools
 import math

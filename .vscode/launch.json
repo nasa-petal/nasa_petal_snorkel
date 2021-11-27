@@ -8,7 +8,21 @@
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",
-            "program": "petal_snorkel.py",
+            "program": "${file}",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Train",
+            "type": "python",
+            "request": "launch",
+            "program": "petal_snorkel_train_golden.py",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Predict_alex",
+            "type": "python",
+            "request": "launch",
+            "program": "petal_snorkel_predict_alex.py",
             "console": "integratedTerminal"
         }
     ]
