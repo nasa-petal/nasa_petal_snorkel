@@ -2,10 +2,6 @@
 
 The NASA PeTaL (Periodic Table of Life) Project is an open source artificial intelligence design tool that leverages data and information from nature and technology to advance biomimicry R&D.
 
-[NASA PeTaL Project GitHub](https://github.com/nasa-petal)
-
-[NASA PeTaL Project Homepage](https://www1.grc.nasa.gov/research-and-engineering/vine/petal/)
-
 # Links
  * [Overview](#overview)
  * [Files](#files)
@@ -27,7 +23,7 @@ This repository contains scripts, notebooks, data, and docs used for utilizing t
   </figcaption>
 </p>
 
-This README was last updated on 9 November 2021.
+This README was last updated on 24 February 2022.
 
 
 # Files
@@ -72,8 +68,11 @@ Takes in data from ```labeled_data.csv``` and applies a -1 'abstain' label to ea
 ## create_labeling_functions.py
 Create keyword labeling functions (lfs) for every rule in ```biomimicry_function_rules.csv```
 
-## petal_snorkel.py
-Trains the snorkel model and returns a prediction of each label.
+## petal_snorkel_train_Alex.py
+Trains snorkel on small subset of golden json papers and returns a prediction of each label.
+
+## petal_snorkel_train_golden.py
+Trains snorkel on golden json papers and returns a prediction of each label.
 
 # More Information
  * [Snorkel Flow](https://snorkel.ai/)
@@ -85,8 +84,7 @@ Trains the snorkel model and returns a prediction of each label.
  * [Practical Weak Supervision](https://learning.oreilly.com/library/view/practical-weak-supervision/9781492077053/)
 
 # Future Work
- * Divide snorkel into multiple models that each handle a subset of functions to increase computing efficiency.
- * Write rules for the remaining 60 biomimicry functions.
+ * Write LFs for the remaining 60 biomimicry functions.
  * Include 'regular expression' labeling functions to increase coverage.
 
 # Contact
