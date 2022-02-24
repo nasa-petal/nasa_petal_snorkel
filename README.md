@@ -30,7 +30,7 @@ This README was last updated on 24 February 2022.
 
 ```snorkel.environment.yml``` environment for running snorkel with required dependencies.
 
-```petal_snorkel.py``` Main file for running snorkel.
+```petal_snorkel_train_golden.py``` Main file for running snorkel.
 
 ```biomimicry_function_rules.csv``` contains rules for 40 of the 100 biomimicry functions.
 
