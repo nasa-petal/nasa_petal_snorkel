@@ -87,9 +87,6 @@ Trains snorkel on golden json papers and returns a prediction of each label.
  * Write LFs for the remaining 60 biomimicry functions.
  * Include 'regular expression' labeling functions to increase coverage.
 
-# Contact
-For questions contact Alexandra Ralevski (alexandra.ralevski@gmail.com)
-
 
 
 
